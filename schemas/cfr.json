@@ -1,0 +1,1584 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Client Financial Review (CFR) data extraction schema for comprehensive financial planning - Supports two clients",
+  "properties": {
+    "document_title": {
+      "type": "string",
+      "description": "Title of the CFR document"
+    },
+    "report_type": {
+      "type": "string",
+      "description": "Type of report (e.g., 'Client Financial Review', 'Annual Review')"
+    },
+    "provider_name": {
+      "type": "string",
+      "description": "Primary provider name associated with the document"
+    },
+    "report_date": {
+      "type": "string",
+      "description": "Date the report was generated (YYYY-MM-DD format)"
+    },
+    "advisor_name": {
+      "type": "string",
+      "description": "Name of the financial advisor"
+    },
+    "advisor_firm": {
+      "type": "string",
+      "description": "Name of the advisory firm"
+    },
+    "currency": {
+      "type": "string",
+      "default": "GBP",
+      "description": "Default currency for all monetary values in the document"
+    },
+    "regulatory_disclaimer_present": {
+      "type": "boolean",
+      "description": "Indicates if a regulatory disclaimer is present in the document"
+    },
+    "has_client_2": {
+      "type": "boolean",
+      "description": "Indicates whether second client data is present"
+    },
+    "client_1": {
+      "type": "object",
+      "description": "Primary client information",
+      "properties": {
+        "personal_details": {
+          "type": "object",
+          "description": "All personal details for the client",
+          "properties": {
+            "personal_information": {
+              "type": "object",
+              "description": "Client's personal identification details",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Client's title (e.g., Mr, Mrs, Dr)."
+                },
+                "forenames": {
+                  "type": "string",
+                  "description": "Client's first and middle names."
+                },
+                "surname": {
+                  "type": "string",
+                  "description": "Client's last name."
+                },
+                "salutation": {
+                  "type": "string",
+                  "description": "The name the client prefers to be called."
+                },
+                "gender": {
+                  "type": "string",
+                  "description": "Client's gender (e.g., Male, Female)."
+                },
+                "maiden_name": {
+                  "type": "string",
+                  "description": "Client's surname at birth, if different."
+                },
+                "dob": {
+                  "type": "string",
+                  "description": "Client's date of birth in YYYY-MM-DD format."
+                },
+                "age": {
+                  "type": "string",
+                  "description": "Client's age in years."
+                },
+                "marital_status": {
+                  "type": "string",
+                  "description": "Client's marital status (e.g., Married, Single, Divorced)."
+                },
+                "classification": {
+                  "type": "string",
+                  "description": "Client classification, typically 'Retail'."
+                },
+                "dependants_flag": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client has dependants"
+                },
+                "made_a_will": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client has made a will"
+                },
+                "national_insurance_no": {
+                  "type": "string",
+                  "description": "Client's National Insurance number."
+                },
+                "nationality_1": {
+                  "type": "string",
+                  "description": "Client's primary nationality."
+                },
+                "nationality_2": {
+                  "type": "string",
+                  "description": "Client's secondary nationality, if any."
+                }
+              }
+            },
+            "risk_profile": {
+              "type": "object",
+              "description": "Client's risk profile from 'Client Risk Profiling' section",
+              "properties": {
+                "Capacity For Loss": {
+                  "type": "string",
+                  "description": "Client's capacity for loss rating (e.g., Low, Moderate, High)"
+                },
+                "Capacity For Loss Reason": {
+                  "type": "string",
+                  "description": "The reasons for the capacity for loss rating"
+                },
+                "Capacity For Loss detail": {
+                  "type": "string",
+                  "description": "Detailed explanation of capacity for loss"
+                },
+                "Investment Knowledge & Experience": {
+                  "type": "string",
+                  "description": "Client's investment experience level (e.g., Limited, Moderate, Extensive)"
+                },
+                "Investment Knowledge & Experience Reason": {
+                  "type": "string",
+                  "description": "Reason for the investment experience rating"
+                },
+                "Investment Knowledge & Experience detail": {
+                  "type": "string",
+                  "description": "Detailed explanation of investment experience"
+                }
+              }
+            },
+            "dependants": {
+              "type": "array",
+              "description": "List of client's dependants",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Full name of the dependant"
+                  },
+                  "date_of_birth": {
+                    "type": "string",
+                    "description": "Dependant's date of birth (DD/MM/YYYY format)"
+                  },
+                  "age": {
+                    "type": "string",
+                    "description": "Dependant's age in years"
+                  },
+                  "relationship": {
+                    "type": "string",
+                    "description": "Relationship to the client (e.g., Child, Spouse)"
+                  },
+                  "financially_dependent": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if they are financially dependent"
+                  },
+                  "health_status": {
+                    "type": "string",
+                    "description": "Brief description of the dependant's health status"
+                  }
+                }
+              }
+            },
+            "address_details": {
+              "type": "object",
+              "description": "Client's address and contact information",
+              "properties": {
+                "home_address": {
+                  "type": "string",
+                  "description": "Client's full home address."
+                },
+                "date_moved_in": {
+                  "type": "string",
+                  "description": "Date the client moved into their current home address."
+                },
+                "previous_address": {
+                  "type": "string",
+                  "description": "Client's previous address, if they have lived at the current one for less than 3 years."
+                },
+                "business_address": {
+                  "type": "string",
+                  "description": "Client's business or work address."
+                },
+                "correspondence_address": {
+                  "type": "string",
+                  "description": "The address to be used for all correspondence."
+                },
+                "telephone": {
+                  "type": "string",
+                  "description": "Client's landline telephone number."
+                },
+                "mobile": {
+                  "type": "string",
+                  "description": "Client's mobile phone number."
+                },
+                "email": {
+                  "type": "string",
+                  "description": "Client's email address."
+                }
+              }
+            },
+            "health_and_occupation": {
+              "type": "object",
+              "description": "Client's health status and employment details",
+              "properties": {
+                "smoker": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client has used tobacco products in the last 12 months"
+                },
+                "good_health": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client considers themselves in good health"
+                },
+                "medical_conditions": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client has any known medical conditions"
+                },
+                "hazardous_hobbies": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client has hazardous hobbies or occupation"
+                },
+                "occupation": {
+                  "type": "string",
+                  "description": "Client's occupation category (e.g., Computer Engineer)."
+                },
+                "job_title": {
+                  "type": "string",
+                  "description": "Client's specific job title (e.g., Principle Product Manager)."
+                },
+                "employer": {
+                  "type": "string",
+                  "description": "Name of the client's employer or business."
+                },
+                "employment_status": {
+                  "type": "string",
+                  "description": "Client's employment status (e.g., Full-time Employed, Not Working)."
+                }
+              }
+            },
+            "income": {
+              "type": "array",
+              "description": "List of client's income sources",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "The source or type of income."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "More specific description (e.g., Salary, Bonus, P11D benefits)"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "The monetary value of the income, typically per annum total gross"
+                  },
+                  "frequency": {
+                    "type": "string",
+                    "description": "How often income is received (e.g., Annually, Monthly)"
+                  },
+                  "taxable": {
+                    "type": "string",
+                    "description": "Indicates if the income is taxable (Yes/No)"
+                  }
+                }
+              }
+            },
+            "expenditure": {
+              "type": "array",
+              "description": "List of client's regular expenditure",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "Category of expenditure (e.g., Essential, Discretionary)"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Monetary value of the expenditure"
+                  },
+                  "frequency": {
+                    "type": "string",
+                    "description": "How often the expenditure occurs (e.g., Monthly)"
+                  }
+                }
+              }
+            },
+            "disposable_income": {
+              "type": "object",
+              "description": "Client's disposable income and emergency fund information",
+              "properties": {
+                "monthly_disposable": {
+                  "type": "string",
+                  "description": "The client's total monthly net income minus total monthly expenditure."
+                },
+                "emergency_fund_available": {
+                  "type": "string",
+                  "description": "The amount of funds the client has available for emergencies."
+                },
+                "emergency_fund_recommended": {
+                  "type": "string",
+                  "description": "The recommended minimum amount for the client's emergency fund."
+                }
+              }
+            },
+            "future_circumstances": {
+              "type": "object",
+              "description": "Expected changes to client's financial circumstances",
+              "properties": {
+                "expect_change": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client expects their financial circumstances to change in the next 5 years."
+                },
+                "change_details": {
+                  "type": "string",
+                  "description": "Details of any expected changes to financial circumstances."
+                }
+              }
+            },
+            "tax_and_residence": {
+              "type": "object",
+              "description": "Client's tax status and residency information",
+              "properties": {
+                "highest_rate_percent": {
+                  "type": "string",
+                  "description": "The client's highest marginal rate of income tax."
+                },
+                "uk_resident_for_tax": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client is a UK resident for tax purposes."
+                },
+                "domiciled_in_uk": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client is domiciled or deemed domiciled in the UK for tax purposes."
+                },
+                "tax_status_change_expected": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client expects their tax status to change in the future."
+                }
+              }
+            },
+            "liabilities": {
+              "type": "array",
+              "description": "List of client's liabilities and debts",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "lender": {
+                    "type": "string",
+                    "description": "Name of the lending institution"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of liability (e.g., Repayment Mortgage, Interest Only Mortgage)"
+                  },
+                  "outstanding_amount": {
+                    "type": "string",
+                    "description": "Total amount of liability remaining to be paid"
+                  },
+                  "monthly_payment": {
+                    "type": "string",
+                    "description": "Regular payment amount"
+                  },
+                  "interest_rate": {
+                    "type": "string",
+                    "description": "Interest rate percentage"
+                  },
+                  "term_remaining_years": {
+                    "type": "string",
+                    "description": "Number of years left on the term"
+                  },
+                  "repayment_method": {
+                    "type": "string",
+                    "description": "Method of repayment (e.g., Capital repayment, interest only)"
+                  }
+                }
+              }
+            },
+            "protection": {
+              "type": "array",
+              "description": "List of client's protection/insurance policies",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "description": "Name of the insurance provider"
+                  },
+                  "policy_number": {
+                    "type": "string",
+                    "description": "Unique identifier for the policy"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of policy (e.g., Life, Critical Illness, Income Protection)"
+                  },
+                  "sum_assured": {
+                    "type": "string",
+                    "description": "Amount payable on a valid claim"
+                  },
+                  "premium": {
+                    "type": "string",
+                    "description": "Premium amount"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Current status of the policy (e.g., In Force)"
+                  }
+                }
+              }
+            },
+            "pensions": {
+              "type": "array",
+              "description": "List of client's pension arrangements",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Scheme Type": {
+                    "type": "string",
+                    "description": "Type of pension scheme (e.g., Money Purchase Scheme)"
+                  },
+                  "Provider": {
+                    "type": "string",
+                    "description": "Name of the pension provider (e.g., Standard Life, Aegon)"
+                  },
+                  "Valuation": {
+                    "type": "object",
+                    "description": "Current monetary value or valuation of the pension plan",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "description": "Numeric value"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "default": "GBP"
+                      }
+                    }
+                  },
+                  "Owner": {
+                    "type": "string",
+                    "description": "Owner of the pension (e.g., Client 1, Client 2)"
+                  },
+                  "Plan Type": {
+                    "type": "string",
+                    "description": "Type of pension plan (e.g., Group Personal Pension Uncrystallised)"
+                  },
+                  "Employer contributions": {
+                    "type": "string",
+                    "description": "Monthly contribution made to the pension by the client's employer"
+                  },
+                  "Status": {
+                    "type": "string",
+                    "description": "Current status of the plan (e.g., In Force, Paid up)"
+                  },
+                  "Plan retirement age": {
+                    "type": "string",
+                    "description": "The retirement age on this specific pension plan"
+                  },
+                  "Frequency (Contributions)": {
+                    "type": "string",
+                    "description": "The frequency the contributions will be paid (Monthly, Yearly)"
+                  },
+                  "Date of valuation": {
+                    "type": "string",
+                    "description": "Date of current valuation (DD/MM/YYYY)"
+                  },
+                  "Policy number": {
+                    "type": "string",
+                    "description": "Unique identifier for the pension plan"
+                  },
+                  "Transfer value": {
+                    "type": "string",
+                    "description": "Current value that will be paid on a transfer"
+                  },
+                  "Member of scheme": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if client is a member of the scheme"
+                  },
+                  "Employer sponsored scheme available": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if employer sponsored scheme is available"
+                  },
+                  "source_pages": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Page numbers where this pension information was found"
+                  }
+                }
+              }
+            },
+            "assets": {
+              "type": "array",
+              "description": "List of client's assets",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Category": {
+                    "type": "string",
+                    "description": "Category of asset (e.g., Cash-based Investment, Property Assets)"
+                  },
+                  "Type of asset/holding": {
+                    "type": "string",
+                    "description": "Detailed type of asset (e.g., Property - Residential)"
+                  },
+                  "Owner": {
+                    "type": "string",
+                    "description": "Owner of the asset (e.g., Client 1)"
+                  },
+                  "Valuation": {
+                    "type": "object",
+                    "description": "Estimated monetary value of the asset",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "description": "Numeric value"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "default": "GBP"
+                      }
+                    }
+                  },
+                  "In trust": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if asset is held in trust"
+                  },
+                  "Relief or exemption applicable": {
+                    "type": "string",
+                    "description": "Any tax relief or exemption applicable to the asset"
+                  },
+                  "source_pages": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Page numbers where this asset information was found"
+                  }
+                }
+              }
+            },
+            "holdings": {
+              "type": "array",
+              "description": "List of client's investment holdings",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "description": "Name of institution where holding is held"
+                  },
+                  "policy_number": {
+                    "type": "string",
+                    "description": "Account or policy number for the holding"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of investment holding (e.g., ISA - Stocks and Shares, GIA)"
+                  },
+                  "value": {
+                    "type": "object",
+                    "description": "Current monetary value of the holding",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "description": "Numeric value"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "default": "GBP"
+                      }
+                    }
+                  },
+                  "source_pages": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Page numbers where this holding information was found"
+                  }
+                }
+              }
+            },
+            "assistance": {
+              "type": "object",
+              "description": "Client vulnerability assessment information",
+              "properties": {
+                "vulnerability_flag": {
+                  "type": "string",
+                  "description": "Indicates if a client is registered or considered potentially vulnerable (e.g., Potential, No)."
+                },
+                "health_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to health (e.g., Severe or long-term illness)."
+                },
+                "life_event_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to life events (e.g., Relationship breakdown)."
+                },
+                "resilience_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to financial resilience (e.g., Inadequate income)."
+                },
+                "capability_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to financial capability (e.g., Low knowledge)."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "client_2": {
+      "type": "object",
+      "description": "Secondary client information (if has_client_2 is true). Structure mirrors client_1 exactly",
+      "properties": {
+        "personal_details": {
+          "type": "object",
+          "description": "All personal details for the client",
+          "properties": {
+            "personal_information": {
+              "type": "object",
+              "description": "Client's personal identification details",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Client's title (e.g., Mr, Mrs, Dr)."
+                },
+                "forenames": {
+                  "type": "string",
+                  "description": "Client's first and middle names."
+                },
+                "surname": {
+                  "type": "string",
+                  "description": "Client's last name."
+                },
+                "salutation": {
+                  "type": "string",
+                  "description": "The name the client prefers to be called."
+                },
+                "gender": {
+                  "type": "string",
+                  "description": "Client's gender (e.g., Male, Female)."
+                },
+                "maiden_name": {
+                  "type": "string",
+                  "description": "Client's surname at birth, if different."
+                },
+                "dob": {
+                  "type": "string",
+                  "description": "Client's date of birth in YYYY-MM-DD format."
+                },
+                "age": {
+                  "type": "string",
+                  "description": "Client's age in years."
+                },
+                "marital_status": {
+                  "type": "string",
+                  "description": "Client's marital status (e.g., Married, Single, Divorced)."
+                },
+                "classification": {
+                  "type": "string",
+                  "description": "Client classification, typically 'Retail'."
+                },
+                "dependants_flag": {
+                  "type": "string",
+                  "enum": [
+                    "Yes",
+                    "No"
+                  ],
+                  "description": "Whether the client has dependants"
+                },
+                "made_a_will": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client has made a will."
+                },
+                "national_insurance_no": {
+                  "type": "string",
+                  "description": "Client's National Insurance number."
+                },
+                "nationality_1": {
+                  "type": "string",
+                  "description": "Client's primary nationality."
+                },
+                "nationality_2": {
+                  "type": "string",
+                  "description": "Client's secondary nationality, if any."
+                }
+              }
+            },
+            "risk_profile": {
+              "type": "object",
+              "description": "Client's risk profile from 'Client Risk Profiling' section",
+              "properties": {
+                "Capacity For Loss": {
+                  "type": "string",
+                  "description": "Client's capacity for loss rating (e.g., Low, Moderate, High)"
+                },
+                "Capacity For Loss Reason": {
+                  "type": "string",
+                  "description": "The reasons for the capacity for loss rating"
+                },
+                "Capacity For Loss detail": {
+                  "type": "string",
+                  "description": "Detailed explanation of capacity for loss"
+                },
+                "Investment Knowledge & Experience": {
+                  "type": "string",
+                  "description": "Client's investment experience level (e.g., Limited, Moderate, Extensive)"
+                },
+                "Investment Knowledge & Experience Reason": {
+                  "type": "string",
+                  "description": "Reason for the investment experience rating"
+                },
+                "Investment Knowledge & Experience detail": {
+                  "type": "string",
+                  "description": "Detailed explanation of investment experience"
+                }
+              }
+            },
+            "dependants": {
+              "type": "array",
+              "description": "List of client's dependants",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Full name of the dependant"
+                  },
+                  "date_of_birth": {
+                    "type": "string",
+                    "description": "Dependant's date of birth (DD/MM/YYYY format)"
+                  },
+                  "age": {
+                    "type": "string",
+                    "description": "Dependant's age in years"
+                  },
+                  "relationship": {
+                    "type": "string",
+                    "description": "Relationship to the client (e.g., Child, Spouse)"
+                  },
+                  "financially_dependent": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if they are financially dependent"
+                  },
+                  "health_status": {
+                    "type": "string",
+                    "description": "Brief description of the dependant's health status"
+                  }
+                }
+              }
+            },
+            "address_details": {
+              "type": "object",
+              "description": "Client's address and contact information",
+              "properties": {
+                "home_address": {
+                  "type": "string",
+                  "description": "Client's full home address."
+                },
+                "date_moved_in": {
+                  "type": "string",
+                  "description": "Date the client moved into their current home address."
+                },
+                "previous_address": {
+                  "type": "string",
+                  "description": "Client's previous address, if they have lived at the current one for less than 3 years."
+                },
+                "business_address": {
+                  "type": "string",
+                  "description": "Client's business or work address."
+                },
+                "correspondence_address": {
+                  "type": "string",
+                  "description": "The address to be used for all correspondence."
+                },
+                "telephone": {
+                  "type": "string",
+                  "description": "Client's landline telephone number."
+                },
+                "mobile": {
+                  "type": "string",
+                  "description": "Client's mobile phone number."
+                },
+                "email": {
+                  "type": "string",
+                  "description": "Client's email address."
+                }
+              }
+            },
+            "health_and_occupation": {
+              "type": "object",
+              "description": "Client's health status and employment details",
+              "properties": {
+                "smoker": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client has used tobacco products in the last 12 months."
+                },
+                "good_health": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client considers themselves in good health."
+                },
+                "medical_conditions": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client suffers from any known medical conditions."
+                },
+                "hazardous_hobbies": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client has hazardous hobbies or a hazardous occupation."
+                },
+                "occupation": {
+                  "type": "string",
+                  "description": "Client's occupation category (e.g., Computer Engineer)."
+                },
+                "job_title": {
+                  "type": "string",
+                  "description": "Client's specific job title (e.g., Principle Product Manager)."
+                },
+                "employer": {
+                  "type": "string",
+                  "description": "Name of the client's employer or business."
+                },
+                "employment_status": {
+                  "type": "string",
+                  "description": "Client's employment status (e.g., Full-time Employed, Not Working)."
+                }
+              }
+            },
+            "income": {
+              "type": "array",
+              "description": "List of client's income sources",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "The source or type of income."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "More specific description (e.g., Salary, Bonus, P11D benefits)"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "The monetary value of the income, typically per annum total gross"
+                  },
+                  "frequency": {
+                    "type": "string",
+                    "description": "How often income is received (e.g., Annually, Monthly)"
+                  },
+                  "taxable": {
+                    "type": "string",
+                    "description": "Indicates if the income is taxable (Yes/No)"
+                  }
+                }
+              }
+            },
+            "expenditure": {
+              "type": "array",
+              "description": "List of client's regular expenditure",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "Category of expenditure (e.g., Essential, Discretionary)"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Monetary value of the expenditure"
+                  },
+                  "frequency": {
+                    "type": "string",
+                    "description": "How often the expenditure occurs (e.g., Monthly)"
+                  }
+                }
+              }
+            },
+            "disposable_income": {
+              "type": "object",
+              "description": "Client's disposable income and emergency fund information",
+              "properties": {
+                "monthly_disposable": {
+                  "type": "string",
+                  "description": "The client's total monthly net income minus total monthly expenditure."
+                },
+                "emergency_fund_available": {
+                  "type": "string",
+                  "description": "The amount of funds the client has available for emergencies."
+                },
+                "emergency_fund_recommended": {
+                  "type": "string",
+                  "description": "The recommended minimum amount for the client's emergency fund."
+                }
+              }
+            },
+            "future_circumstances": {
+              "type": "object",
+              "description": "Expected changes to client's financial circumstances",
+              "properties": {
+                "expect_change": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client expects their financial circumstances to change in the next 5 years."
+                },
+                "change_details": {
+                  "type": "string",
+                  "description": "Details of any expected changes to financial circumstances."
+                }
+              }
+            },
+            "tax_and_residence": {
+              "type": "object",
+              "description": "Client's tax status and residency information",
+              "properties": {
+                "highest_rate_percent": {
+                  "type": "string",
+                  "description": "The client's highest marginal rate of income tax."
+                },
+                "uk_resident_for_tax": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client is a UK resident for tax purposes."
+                },
+                "domiciled_in_uk": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client is domiciled or deemed domiciled in the UK for tax purposes."
+                },
+                "tax_status_change_expected": {
+                  "type": "string",
+                  "description": "A Yes/No flag indicating if the client expects their tax status to change in the future."
+                }
+              }
+            },
+            "liabilities": {
+              "type": "array",
+              "description": "List of client's liabilities and debts",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "lender": {
+                    "type": "string",
+                    "description": "Name of the lending institution"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of liability (e.g., Repayment Mortgage, Interest Only Mortgage)"
+                  },
+                  "outstanding_amount": {
+                    "type": "string",
+                    "description": "Total amount of liability remaining to be paid"
+                  },
+                  "monthly_payment": {
+                    "type": "string",
+                    "description": "Regular payment amount"
+                  },
+                  "interest_rate": {
+                    "type": "string",
+                    "description": "Interest rate percentage"
+                  },
+                  "term_remaining_years": {
+                    "type": "string",
+                    "description": "Number of years left on the term"
+                  },
+                  "repayment_method": {
+                    "type": "string",
+                    "description": "Method of repayment (e.g., Capital repayment, interest only)"
+                  }
+                }
+              }
+            },
+            "protection": {
+              "type": "array",
+              "description": "List of client's protection/insurance policies",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "description": "Name of the insurance provider"
+                  },
+                  "policy_number": {
+                    "type": "string",
+                    "description": "Unique identifier for the policy"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of policy (e.g., Life, Critical Illness, Income Protection)"
+                  },
+                  "sum_assured": {
+                    "type": "string",
+                    "description": "Amount payable on a valid claim"
+                  },
+                  "premium": {
+                    "type": "string",
+                    "description": "Premium amount"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Current status of the policy (e.g., In Force)"
+                  }
+                }
+              }
+            },
+            "pensions": {
+              "type": "array",
+              "description": "List of client's pension arrangements",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Scheme Type": {
+                    "type": "string",
+                    "description": "Type of pension scheme (e.g., Money Purchase Scheme)"
+                  },
+                  "Provider": {
+                    "type": "string",
+                    "description": "Name of the pension provider (e.g., Standard Life, Aegon)"
+                  },
+                  "Valuation": {
+                    "type": "object",
+                    "description": "Current monetary value or valuation of the pension plan",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "description": "Numeric value"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "default": "GBP"
+                      }
+                    }
+                  },
+                  "Owner": {
+                    "type": "string",
+                    "description": "Owner of the pension (e.g., Client 1, Client 2)"
+                  },
+                  "Plan Type": {
+                    "type": "string",
+                    "description": "Type of pension plan (e.g., Group Personal Pension Uncrystallised)"
+                  },
+                  "Employer contributions": {
+                    "type": "string",
+                    "description": "Monthly contribution made to the pension by the client's employer"
+                  },
+                  "Status": {
+                    "type": "string",
+                    "description": "Current status of the plan (e.g., In Force, Paid up)"
+                  },
+                  "Plan retirement age": {
+                    "type": "string",
+                    "description": "The retirement age on this specific pension plan"
+                  },
+                  "Frequency (Contributions)": {
+                    "type": "string",
+                    "description": "The frequency the contributions will be paid (Monthly, Yearly)"
+                  },
+                  "Date of valuation": {
+                    "type": "string",
+                    "description": "Date of current valuation (DD/MM/YYYY)"
+                  },
+                  "Policy number": {
+                    "type": "string",
+                    "description": "Unique identifier for the pension plan"
+                  },
+                  "Transfer value": {
+                    "type": "string",
+                    "description": "Current value that will be paid on a transfer"
+                  },
+                  "Member of scheme": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if client is a member of the scheme"
+                  },
+                  "Employer sponsored scheme available": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if employer sponsored scheme is available"
+                  },
+                  "source_pages": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Page numbers where this pension information was found"
+                  }
+                }
+              }
+            },
+            "assets": {
+              "type": "array",
+              "description": "List of client's assets",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Category": {
+                    "type": "string",
+                    "description": "Category of asset (e.g., Cash-based Investment, Property Assets)"
+                  },
+                  "Type of asset/holding": {
+                    "type": "string",
+                    "description": "Detailed type of asset (e.g., Property - Residential)"
+                  },
+                  "Owner": {
+                    "type": "string",
+                    "description": "Owner of the asset (e.g., Client 1)"
+                  },
+                  "Valuation": {
+                    "type": "object",
+                    "description": "Estimated monetary value of the asset",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "description": "Numeric value"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "default": "GBP"
+                      }
+                    }
+                  },
+                  "In trust": {
+                    "type": "string",
+                    "description": "Yes/No flag indicating if asset is held in trust"
+                  },
+                  "Relief or exemption applicable": {
+                    "type": "string",
+                    "description": "Any tax relief or exemption applicable to the asset"
+                  },
+                  "source_pages": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Page numbers where this asset information was found"
+                  }
+                }
+              }
+            },
+            "holdings": {
+              "type": "array",
+              "description": "List of client's investment holdings",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "description": "Name of institution where holding is held"
+                  },
+                  "policy_number": {
+                    "type": "string",
+                    "description": "Account or policy number for the holding"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Type of investment holding (e.g., ISA - Stocks and Shares, GIA)"
+                  },
+                  "value": {
+                    "type": "object",
+                    "description": "Current monetary value of the holding",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "description": "Numeric value"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "default": "GBP"
+                      }
+                    }
+                  },
+                  "source_pages": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Page numbers where this holding information was found"
+                  }
+                }
+              }
+            },
+            "assistance": {
+              "type": "object",
+              "description": "Client vulnerability assessment information",
+              "properties": {
+                "vulnerability_flag": {
+                  "type": "string",
+                  "description": "Indicates if a client is registered or considered potentially vulnerable (e.g., Potential, No)."
+                },
+                "health_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to health (e.g., Severe or long-term illness)."
+                },
+                "life_event_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to life events (e.g., Relationship breakdown)."
+                },
+                "resilience_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to financial resilience (e.g., Inadequate income)."
+                },
+                "capability_reasons": {
+                  "type": "string",
+                  "description": "Vulnerability reasons related to financial capability (e.g., Low knowledge)."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "meeting_summary": {
+      "type": "object",
+      "description": "Meeting and review summary",
+      "properties": {
+        "meeting_date": {
+          "type": "string",
+          "description": "Date of the meeting (DD/MM/YYYY format)"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Purpose of the meeting"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Meeting notes and summary"
+        }
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "description": "Disclosure and review information",
+      "properties": {
+        "last_cfr_review_date": {
+          "type": "string",
+          "description": "Date of the last Confidential Financial Review (YYYY-MM-DD)"
+        },
+        "partner_disclosure_notes": {
+          "type": "string",
+          "description": "Will include the Date of the last Disclosure (Date of SCDD)"
+        },
+        "client_disclosure_complete": {
+          "type": "string",
+          "description": "Indicates if the client completed full disclosure of information (Yes/No)"
+        },
+        "client_disclosure_reason": {
+          "type": "string",
+          "description": "Explanation for why full disclosure was not completed, if applicable"
+        }
+      }
+    },
+    "client_risk_profiling": {
+      "type": "object",
+      "description": "Client's risk profile assessment",
+      "properties": {
+        "capacity_for_loss": {
+          "type": "string",
+          "description": "Client's capacity for loss rating (Low, Moderate, High)"
+        },
+        "capacity_for_loss_reason": {
+          "type": "string",
+          "description": "The Reasons for the capacity for loss rating"
+        },
+        "capacity_for_loss_detail": {
+          "type": "string",
+          "description": "Detailed explanation of capacity for loss"
+        },
+        "investment_experience": {
+          "type": "string",
+          "description": "Client's investment experience level (Limited, Moderate, Extensive)"
+        },
+        "investment_experience_reason": {
+          "type": "string",
+          "description": "Reason for the investment experience rating"
+        },
+        "investment_experience_detail": {
+          "type": "string",
+          "description": "Detailed explanation of investment experience"
+        }
+      }
+    },
+    "protection_planning": {
+      "type": "object",
+      "description": "Protection planning priorities and requirements",
+      "properties": {
+        "client_priorities": {
+          "type": "string",
+          "description": "Client's protection priorities"
+        },
+        "trust_requirements": {
+          "type": "string",
+          "description": "Trust requirements for policies"
+        },
+        "capital_income_on_death": {
+          "type": "string",
+          "description": "Capital/income required on death"
+        },
+        "capital_on_critical_illness": {
+          "type": "string",
+          "description": "Capital required on critical illness"
+        }
+      }
+    },
+    "retirement_planning": {
+      "type": "object",
+      "description": "Retirement planning goals and risk attitudes",
+      "properties": {
+        "client_priorities": {
+          "type": "string",
+          "description": "Detailed summary of client's retirement goals"
+        },
+        "pre_retirement_risk": {
+          "type": "string",
+          "description": "Client's attitude to risk for pre-retirement funding"
+        },
+        "at_retirement_risk_attitude": {
+          "type": "string",
+          "description": "Attitude to risk for options at retirement"
+        },
+        "accept_reduce_income": {
+          "type": "string",
+          "description": "Yes/No if prepared to accept reduction in income"
+        },
+        "accept_reduce_fund": {
+          "type": "string",
+          "description": "Yes/No if prepared to accept reduction in fund value"
+        },
+        "accept_reduce_death_benefits": {
+          "type": "string",
+          "description": "Yes/No if prepared to accept reduction in death benefits"
+        },
+        "employer_scheme": {
+          "type": "string",
+          "description": "Do you have an employer sponsored scheme available (YES/NO)"
+        },
+        "which_type_of_scheme_available": {
+          "type": "string",
+          "description": "Money Purchase Scheme, Final Salary, etc."
+        },
+        "are_you_in_waiting_period": {
+          "type": "string",
+          "description": "Indicates if in a waiting period to join a scheme (YES/NO)"
+        },
+        "are_you_member_of_scheme": {
+          "type": "string",
+          "description": "Are you a member of the scheme (YES/NO)"
+        },
+        "pension_basis": {
+          "type": "string",
+          "description": "Contributions or benefits basis"
+        },
+        "preferred_retirement_age": {
+          "type": "string",
+          "description": "Client's preferred age for retirement"
+        }
+      }
+    },
+    "investment_planning": {
+      "type": "object",
+      "description": "Investment planning objectives and tax allowances",
+      "properties": {
+        "investment_timeframe": {
+          "type": "string",
+          "description": "Investment Horizon in years (Medium 5-15, Long 15+)"
+        },
+        "investment_objective": {
+          "type": "string",
+          "description": "Primary investment objective"
+        },
+        "explain_why_timeframe_appropriate": {
+          "type": "string",
+          "description": "Reason why the investment horizon is appropriate"
+        },
+        "target_amount_capital_growth": {
+          "type": "string",
+          "description": "Target amount for capital growth"
+        },
+        "attitude_to_risk": {
+          "type": "string",
+          "description": "Attitude to risk for investment planning"
+        },
+        "is_there_specific_target_amount": {
+          "type": "string",
+          "description": "Whether there is a specific target amount"
+        },
+        "target_amount_required": {
+          "type": "string",
+          "description": "Amount required in today's terms"
+        },
+        "target_date": {
+          "type": "string",
+          "description": "When the target amount is required"
+        },
+        "indexation_rate": {
+          "type": "string",
+          "description": "Indexation rate for target fund"
+        }
+      }
+    },
+    "st_jamess_place_plans": {
+      "type": "array",
+      "description": "Unified array of ALL St. James's Place plans, products, pensions, ISAs, bonds, and investments. Every SJP product must be captured ONLY in this array - one object per distinct plan.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "plan_name": {
+            "type": "string",
+            "description": "Name or description of the plan"
+          },
+          "plan_type": {
+            "type": "string",
+            "description": "Type of plan (e.g., 'SIPP', 'Stocks & Shares ISA', 'Investment Bond', 'Pension')"
+          },
+          "plan_reference_number": {
+            "type": "string",
+            "description": "Unique policy/plan reference number"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Must be 'St. James's Place'"
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "Client 1",
+              "Client 2",
+              "Joint"
+            ],
+            "description": "Owner of the plan"
+          },
+          "plan_start_date": {
+            "type": "string",
+            "description": "Start date of the plan (ISO date format if available)"
+          },
+          "valuation_date": {
+            "type": "string",
+            "description": "Date of the current valuation"
+          },
+          "current_value": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "description": "Numeric value of the plan"
+              },
+              "currency": {
+                "type": "string",
+                "default": "GBP",
+                "description": "Currency code"
+              }
+            }
+          },
+          "risk_profile": {
+            "type": "string",
+            "description": "Risk profile assigned to this plan"
+          },
+          "tax_wrapper": {
+            "type": "string",
+            "description": "Tax wrapper type (e.g., 'ISA', 'Pension', 'GIA', 'Bond')"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "Paid Up",
+              "Closed"
+            ],
+            "description": "Current status of the plan"
+          },
+          "charges": {
+            "type": "object",
+            "properties": {
+              "ongoing": {
+                "type": "string",
+                "description": "Ongoing charge percentage"
+              },
+              "advice": {
+                "type": "string",
+                "description": "Advice fee percentage"
+              },
+              "product": {
+                "type": "string",
+                "description": "Product charge percentage"
+              }
+            }
+          },
+          "holdings": {
+            "type": "array",
+            "description": "Fund holdings within this plan",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fund_name": {
+                  "type": "string",
+                  "description": "Name of the fund"
+                },
+                "isin": {
+                  "type": "string",
+                  "description": "Fund ISIN identifier"
+                },
+                "allocation_percentage": {
+                  "type": "number",
+                  "description": "Percentage allocation"
+                },
+                "fund_value": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "default": "GBP"
+                    }
+                  }
+                },
+                "risk_rating": {
+                  "type": "string",
+                  "description": "Risk rating of the fund"
+                }
+              }
+            }
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes specific to this plan"
+          },
+          "source_pages": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Page numbers in the source document where this plan information was found"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes and comments about the client"
+    }
+  }
+}

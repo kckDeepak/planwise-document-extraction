@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Extraction Tool</title>
+  <meta name="description" content="Extract structured data from PDF documents using AI-powered extraction">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">📄</span>
+        <h1>Document Extraction Tool</h1>
+      </div>
+      <p class="tagline">AI-powered data extraction from PDF documents</p>
+    </header>
+
+    <main class="main-content">
+      <!-- Upload Section -->
+      <section class="upload-section glass-card">
+        <form id="extractForm">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">📁</span>
+              Select Documents (PDF, DOCX, XLSX, CSV, HTML, Images, MSG)
+            </label>
+            <!-- Hidden file inputs - controlled by buttons -->
+            <input type="file" id="fileInput" name="files" multiple accept=".pdf,.docx,.doc,.xlsx,.xlsm,.xls,.csv,.html,.htm,.jpeg,.jpg,.png,.gif,.tiff,.msg" style="display: none;">
+            <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
+            
+            <div class="file-drop-zone" id="dropZone">
+              <div class="drop-zone-content">
+                <span class="drop-icon">⬆️</span>
+                <p class="drop-text">Drag & drop files here or use buttons below</p>
+                <p class="file-count" id="fileCount">No files selected</p>
+                <div class="upload-buttons">
+                  <button type="button" id="selectFilesBtn" class="btn-upload">📄 Select Files</button>
+                  <button type="button" id="selectFolderBtn" class="btn-upload">📁 Select Folder</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="modelSelect" class="form-label">
+              <span class="label-icon">🤖</span>
+              Extraction Model
+            </label>
+            <select id="modelSelect" name="model" class="form-select">
+              <option value="datalab">DataLab (Default)</option>
+              <option value="reducto">Reducto AI</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="schemaSelect" class="form-label">
+              <span class="label-icon">📋</span>
+              Schema Type
+            </label>
+            <select id="schemaSelect" name="schema" class="form-select">
+              <option value="cfr">Client Financial Review (CFR)</option>
+              <option value="ceding">Ceding Scheme Information</option>
+              <option value="custom_ceding">Custom Ceding Schema</option>
+              <option value="ess">Employer-Sponsored Scheme (ESS)</option>
+            </select>
+          </div>
+
+          <!-- Custom Ceding Schema Builder (hidden by default) -->
+          <div id="customCedingSection" class="custom-ceding-section" style="display: none;">
+            <div class="custom-ceding-header">
+              <h3>📝 Custom Fields</h3>
+              <p>Add extra fields to extract alongside standard ceding fields</p>
+            </div>
+            
+            <div id="customFieldsList" class="custom-fields-list">
+              <!-- Custom fields will be added here -->
+            </div>
+            
+            <div class="add-field-form">
+              <div class="field-inputs">
+                <input type="text" id="newFieldName" class="form-input" placeholder="Field name (e.g., special_bonus)">
+                <select id="newFieldType" class="form-select field-type-select">
+                  <option value="string">Text (String)</option>
+                  <option value="number">Number</option>
+                  <option value="table">Table/Array</option>
+                  <option value="boolean">Yes/No (Boolean)</option>
+                </select>
+                <input type="text" id="newFieldDescription" class="form-input field-desc" placeholder="Description (e.g., Special bonus percentage)">
+              </div>
+              <button type="button" id="addFieldBtn" class="btn btn-add-field">
+                <span class="btn-icon">➕</span>
+                Add Field
+              </button>
+            </div>
+            
+            <div class="custom-schema-actions">
+              <button type="button" id="saveCustomSchemaBtn" class="btn btn-primary btn-save-schema" disabled>
+                <span class="btn-icon">💾</span>
+                Save Custom Schema
+              </button>
+              <span id="customSchemaStatus" class="schema-status"></span>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="submit" id="submitBtn" class="btn btn-primary" disabled>
+              <span class="btn-icon">🔍</span>
+              Extract Data
+            </button>
+            <button type="button" id="cancelBtn" class="btn btn-danger" style="display: none;">
+              <span class="btn-icon">✕</span>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Progress Section -->
+      <section id="progressSection" class="progress-section glass-card" style="display: none;">
+        <h3 class="section-title">
+          <span class="title-icon" id="progressIcon">🔄</span>
+          <span id="progressTitle">Processing...</span>
+        </h3>
+
+        <div class="progress-bar-container">
+          <div class="progress-info">
+            <span id="currentTask">Initializing...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="progress-log" id="progressLog">
+          <!-- Log entries will be added here -->
+        </div>
+      </section>
+
+      <!-- Error Section -->
+      <section id="errorSection" class="error-section glass-card" style="display: none;">
+        <div class="error-content">
+          <span class="error-icon">❌</span>
+          <p id="errorMessage"></p>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section id="resultsSection" class="results-section" style="display: none;">
+        <div class="results-header glass-card">
+          <div class="results-info">
+            <h2>Extraction Results</h2>
+            <p id="timeTaken"></p>
+          </div>
+          <div class="view-toggle">
+            <button id="tableViewBtn" class="btn btn-toggle active">
+              <span class="btn-icon">📊</span>
+              Table View
+            </button>
+            <button id="jsonViewBtn" class="btn btn-toggle">
+              <span class="btn-icon">{ }</span>
+              JSON View
+            </button>
+            <button id="generatePdfBtn" class="btn btn-primary" style="display: none; margin-left: 1rem;">
+              <span class="btn-icon">📄</span>
+              Generate PDF
+            </button>
+          </div>
+        </div>
+
+        <div id="tableView" class="results-container"></div>
+        <div id="jsonView" class="results-container json-view" style="display: none;">
+          <pre id="jsonContent"></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Hybrid Extraction • Reducto AI & DataLab</p>
+    </footer>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

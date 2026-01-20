@@ -1,0 +1,577 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "JSON schema for extracting data from St. James's Place Critical Yield Calculator (CYC) Reports. IMPORTANT: Extract values ONLY if explicitly stated. Return 'Not Stated' if missing. Extended schema for Critical Yield Comparison (CYC).",
+  "properties": {
+    "basic_details": {
+      "type": "object",
+      "description": "General report information and client details.",
+      "properties": {
+        "client_name": {
+          "type": "string",
+          "description": "Name of the client (e.g., 'Victor Tray' or 'prepared_for_client_name')"
+        },
+        "client_dob": {
+          "type": "string",
+          "description": "Client's date of birth (e.g., '23/06/1997')"
+        },
+        "partner_name": {
+          "type": "string",
+          "description": "Advisor/Partner Name (e.g., 'Shaf Hussain')"
+        },
+        "partner_code": {
+          "type": "string",
+          "description": "Partner code (e.g., '922926W')"
+        },
+        "attitude_to_risk": {
+          "type": "string",
+          "description": "Client's attitude to risk (e.g., 'Upper-medium', 'Medium', 'Lower-medium')"
+        },
+        "is_sophisticated_investor": {
+          "type": "string",
+          "description": "Is the client considered to be an experienced or sophisticated investor?",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        },
+        "has_ess_access": {
+          "type": "string",
+          "description": "Does the client have access to a Money Purchase Employer Sponsored Scheme (ESS) that will allow transfers or redirection of regular contributions?",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        },
+        "is_replacing_ess": {
+          "type": "string",
+          "description": "Are you replacing the ESS?",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        },
+        "additional_notes": {
+          "type": "string",
+          "description": "Any additional notes or context found in the basic details section."
+        },
+        "report_title": {
+          "type": "string",
+          "description": "Title of the document (e.g., 'Critical Yield Calculator Report')"
+        },
+        "report_date": {
+          "type": "string",
+          "description": "Date of report generation (e.g., '11 November 2025')"
+        },
+        "reference_number": {
+          "type": "string",
+          "description": "Unique reference number (e.g., '1646932')"
+        },
+        "is_internal_use_only": {
+          "type": "boolean",
+          "description": "True if 'INTERNAL USE ONLY' text is present on cover page"
+        },
+        "transferring_crystallised_funds": {
+          "type": "string",
+          "description": "Are you transferring crystallised funds or will funds be crystallised in the next 12 months as part of the advice?",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        },
+        "intend_withdraw_within_20_years": {
+          "type": "string",
+          "description": "Does the client intend to fully withdraw the replacement from SJP within the next 20 years?"
+        },
+        "ess_only_comparison_required": {
+          "type": "string",
+          "description": "Do you require an ESS only comparison?",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        }
+      },
+      "required": [
+        "client_name",
+        "client_dob"
+      ]
+    },
+    "calculation_context": {
+      "type": "object",
+      "description": "CYC calculation assumptions and configuration",
+      "properties": {
+        "calculation_basis": {
+          "type": "string",
+          "description": "What basis are you using for this CYC calculation? (e.g., 'Plan charges', 'projection')"
+        },
+        "calculation_term_months": {
+          "type": "string",
+          "description": "Term used for calculation (e.g., '20 years, 0 months')"
+        },
+        "charge_tiering_applied": {
+          "type": "boolean",
+          "description": "Product charge tiering has been considered in the calculations where it applies."
+        },
+        "redirection_test_applied": {
+          "type": "boolean",
+          "description": "Redirection test status if mentioned."
+        },
+        "cyc_version": {
+          "type": "string",
+          "description": "CYC system version from footer (e.g., 'CYC Version 2.1.0 (v2)')"
+        }
+      }
+    },
+    "transfer_summary": {
+      "type": "object",
+      "description": "Transfer and lump sum summary values.",
+      "properties": {
+        "transfer_fund_value": {
+          "type": "string",
+          "description": "Total transfer/fund value in GBP (e.g., '£24,303.86')"
+        },
+        "new_lump_sum": {
+          "type": "string",
+          "description": "New lump sum amount in GBP (e.g., '£0.00')"
+        },
+        "total_transfer_and_lump_sum": {
+          "type": "string",
+          "description": "Total transfer & lump sum in GBP (e.g., '£24,303.86')"
+        }
+      }
+    },
+    "overall_results": {
+      "type": "object",
+      "description": "Overall results and status of the recommendation.",
+      "properties": {
+        "overall_status": {
+          "type": "string",
+          "description": "Full result text (e.g., 'The CYC for this recommendation is within allowable limits.')"
+        },
+        "partner_entitlement_adjusted": {
+          "type": "string",
+          "description": "Notes on IAC adjustment if present (e.g., 'Where necessary, the Initial Advice Charge (IAC) has been adjusted...')"
+        },
+        "critical_yield_limit_percent": {
+          "type": "string",
+          "description": "Critical Yield Limit percentage (e.g., '0.75%') - Overall if stated."
+        },
+        "overall_outperformance_required_percent": {
+          "type": "string",
+          "description": "Overall level of outperformance required (e.g., '1.54%')"
+        },
+        "year_one_monetary_equivalent": {
+          "type": "string",
+          "description": "Overall monetary equivalent in Year 1 (e.g., '362.96')"
+        }
+      }
+    },
+    "existing_plans": {
+      "type": "array",
+      "description": "Details and results for each existing plan to be replaced.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "plan_name": {
+            "type": "string",
+            "description": "Name of the plan (e.g., 'WPL_ LEGAL & GENERAL WORKSAVE PENSION PLAN')"
+          },
+          "provider_name": {
+            "type": "string",
+            "description": "Provider name (e.g., 'Legal & General')"
+          },
+          "provider_number": {
+            "type": "string",
+            "description": "Provider/Plan number (e.g., '2453729301')"
+          },
+          "is_current_ess": {
+            "type": "boolean",
+            "description": "Is this a current ESS?"
+          },
+          "commencement_date": {
+            "type": "string",
+            "description": "When did the plan commence? (e.g., '30/07/2018')"
+          },
+          "transfer_value": {
+            "type": "string",
+            "description": "Transfer/fund value in GBP for this plan (e.g., '£24,303.86')"
+          },
+          "result_status": {
+            "type": "string",
+            "description": "Pass or Fail status",
+            "enum": [
+              "Pass",
+              "Fail"
+            ]
+          },
+          "failure_reason": {
+            "type": "string",
+            "description": "Reason for failure if applicable."
+          },
+          "outperformance_required_percent": {
+            "type": "string",
+            "description": "Level of outperformance required percentage for this plan."
+          },
+          "year_one_monetary_equivalent": {
+            "type": "string",
+            "description": "Monetary equivalent in Year 1 for this plan."
+          },
+          "critical_yield_limit_percent": {
+            "type": "string",
+            "description": "Critical Yield Limit percentage for this plan."
+          },
+          "retirement_age": {
+            "type": "string",
+            "description": "Retirement age used in calculation."
+          },
+          "lifestyling_applied": {
+            "type": "string",
+            "description": "Does the projection include Lifestyling?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "investment_type": {
+            "type": "string",
+            "enum": [
+              "cash",
+              "equity",
+              "mixed"
+            ],
+            "description": "Investment type (e.g. 'invested in true cash')."
+          },
+          "charges": {
+            "type": "object",
+            "properties": {
+              "product_charge_percent": {
+                "type": "string",
+                "description": "Product charge percentage (e.g. '0.35%')"
+              },
+              "fund_annual_charge_percent": {
+                "type": "string",
+                "description": "Fund annual charge percentage (e.g., '0.27%')"
+              },
+              "fixed_policy_fee": {
+                "type": "string",
+                "description": "Fixed policy fee amount."
+              },
+              "fixed_policy_fee_frequency": {
+                "type": "string",
+                "description": "Frequency of fixed policy fee."
+              },
+              "charge_periods": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "charge_percent": {
+                      "type": "string",
+                      "description": "Annual charge percentage"
+                    },
+                    "from_month": {
+                      "type": "string",
+                      "description": "From month"
+                    },
+                    "to_month": {
+                      "type": "string",
+                      "description": "To month"
+                    }
+                  }
+                }
+              },
+              "notes": {
+                "type": "string",
+                "description": "Notes regarding charges."
+              }
+            }
+          },
+          "feature_checks": {
+            "type": "object",
+            "description": "Additional feature checks preserved from original schema",
+            "properties": {
+              "financial_remuneration_impact": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No"
+                ],
+                "description": "Has either an Initial charge or any form of financial remuneration been taken...?"
+              },
+              "lump_sum_being_transferred": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No"
+                ],
+                "description": "Is a lump sum from this plan being transferred...?"
+              },
+              "with_profits_implicit_charges": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No"
+                ],
+                "description": "Is this a With Profits plan...?"
+              },
+              "early_withdrawal_charge_exists": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No"
+                ],
+                "description": "Does the plan have an Early Withdrawal Charge?"
+              },
+              "market_value_adjustment_applies": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No"
+                ],
+                "description": "Does a Market Value Adjustment apply?"
+              },
+              "loyalty_bonuses_exist": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No"
+                ],
+                "description": "Does the plan have any Loyalty Bonuses?"
+              }
+            }
+          }
+        }
+      }
+    },
+    "recommended_plan": {
+      "type": "object",
+      "properties": {
+        "product_name": {
+          "type": "string",
+          "description": "Recommended SJP product name (e.g., 'Retirement Account')"
+        },
+        "total_transfer_value": {
+          "type": "string",
+          "description": "Total transfer value"
+        },
+        "advice_charges": {
+          "type": "object",
+          "properties": {
+            "standard_iac_percent": {
+              "type": "string",
+              "description": "Standard IAC percentage (e.g., '3.00%')"
+            },
+            "iac_required_to_proceed_percent": {
+              "type": "string",
+              "description": "IAC required to proceed percentage (e.g., '3.00%')"
+            },
+            "iac_after_reduction_percent": {
+              "type": "string",
+              "description": "IAC after reduction if applicable."
+            },
+            "iaf_percent": {
+              "type": "string",
+              "description": "Initial Advice Fee percentage (e.g., '2.00%')"
+            },
+            "credit_percent": {
+              "type": "string",
+              "description": "Credit percentage (e.g., '2.00%')"
+            },
+            "maximise_iaf": {
+              "type": "boolean",
+              "description": "Whether IAF is maximised."
+            }
+          }
+        },
+        "ongoing_charges": {
+          "type": "object",
+          "properties": {
+            "product_charge_percent": {
+              "type": "string",
+              "description": "Product charge percentage (e.g., '0.35%')"
+            },
+            "ongoing_advice_fee_percent": {
+              "type": "string",
+              "description": "Ongoing Advice Charge percentage (e.g., '0.80%')"
+            },
+            "fund_charge_percent": {
+              "type": "string",
+              "description": "Fund charge percentage (e.g., '0.55%')"
+            },
+            "annual_management_charge_percent": {
+              "type": "string",
+              "description": "Annual management charge."
+            }
+          }
+        },
+        "will_enter_drawdown": {
+          "type": "boolean",
+          "description": "Will enter drawdown?"
+        },
+        "calculated_rate_percent": {
+          "type": "string",
+          "description": "Calculated overall rate."
+        },
+        "is_top_up": {
+          "type": "string",
+          "description": "Is this a top-up to an existing SJP Plan?",
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        }
+      }
+    },
+    "fund_allocations": {
+      "type": "array",
+      "description": "Fund & Portfolio selection for the new plan",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fund_name": {
+            "type": "string",
+            "description": "Fund name (e.g., 'Polaris 4')"
+          },
+          "allocation_percent": {
+            "type": "string",
+            "description": "Allocation percentage (e.g., '100.00%')"
+          }
+        }
+      }
+    },
+    "employer_scheme_comparison": {
+      "type": "array",
+      "description": "Comparison with Employer Sponsored Schemes table - information needed for Suitability Letter",
+      "items": {
+        "type": "object",
+        "properties": {
+          "employer_name": {
+            "type": "string",
+            "description": "Employer name (e.g., 'BG Partners')"
+          },
+          "scheme_provider": {
+            "type": "string",
+            "description": "Scheme provider name (e.g., 'Hargreaves Lansdown')"
+          },
+          "charges_per_annum_employer_scheme": {
+            "type": "string",
+            "description": "Charges per annum of Employers Scheme (e.g., '0.55%')"
+          },
+          "charges_per_annum_sjp_replacement": {
+            "type": "string",
+            "description": "Charges per annum of SJP replacement plan (e.g., '1.85%')"
+          },
+          "additional_annual_percentage_growth_required": {
+            "type": "string",
+            "description": "Additional annual percentage growth required by SJP replacement plan (e.g., '1.30%')"
+          },
+          "additional_annual_growth_required_gbp": {
+            "type": "string",
+            "description": "Additional annual growth required in GBP (e.g., '£306.63')"
+          }
+        }
+      }
+    },
+    "employer_sponsored_scheme_details": {
+      "type": "array",
+      "description": "Details of Employer-Sponsored Schemes for comparison",
+      "items": {
+        "type": "object",
+        "properties": {
+          "employer": {
+            "type": "string",
+            "description": "Employer name (e.g., 'BG Partners')"
+          },
+          "scheme_provider": {
+            "type": "string",
+            "description": "Scheme provider (e.g., 'Hargreaves Lansdown')"
+          },
+          "loyalty_bonuses": {
+            "type": "string",
+            "description": "Does the plan have any Loyalty Bonuses?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "initial_charge_single_contributions": {
+            "type": "string",
+            "description": "Is an initial charge applied to new single contributions?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "initial_charge_transfers_in": {
+            "type": "string",
+            "description": "Is an initial charge applied to transfers in?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "initial_charge_regular_contributions": {
+            "type": "string",
+            "description": "Is an Initial Charge applied to regular contributions?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "product_wrapper_charge": {
+            "type": "string",
+            "description": "Product/Wrapper annual charge (e.g., '0.45%')"
+          },
+          "funds_have_same_charge": {
+            "type": "string",
+            "description": "Do all funds have the same annual charge?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "fund_charge_details": {
+            "type": "array",
+            "description": "Fund charge details if funds have different charges",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fund_name": {
+                  "type": "string",
+                  "description": "Fund name (e.g., 'BlackRock Consensus 85 Class I')"
+                },
+                "allocation": {
+                  "type": "string",
+                  "description": "Allocation amount in GBP (e.g., '£6,407.58')"
+                },
+                "total_annual_charge": {
+                  "type": "string",
+                  "description": "Total annual charge percentage (e.g., '0.09%')"
+                }
+              }
+            }
+          },
+          "calculated_rate": {
+            "type": "string",
+            "description": "Calculated overall rate (e.g., '0.10%')"
+          },
+          "has_fixed_policy_fee": {
+            "type": "string",
+            "description": "Does this plan have a fixed charge/policy fee?",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "basic_details",
+    "transfer_summary",
+    "existing_plans",
+    "recommended_plan"
+  ]
+}
