@@ -50,8 +50,8 @@
               Extraction Model
             </label>
             <select id="modelSelect" name="model" class="form-select">
-              <option value="datalab">DataLab (Default)</option>
-              <option value="reducto">Reducto AI</option>
+              <option value="reducto">Reducto AI (Default)</option>
+              <option value="datalab">DataLab</option>
             </select>
           </div>
 
@@ -71,29 +71,70 @@
           <!-- Custom Ceding Schema Builder (hidden by default) -->
           <div id="customCedingSection" class="custom-ceding-section" style="display: none;">
             <div class="custom-ceding-header">
-              <h3>📝 Custom Fields</h3>
-              <p>Add extra fields to extract alongside standard ceding fields</p>
+              <h3>📝 Customize Ceding Schema</h3>
+              <p>Browse existing sections and add your custom fields to any section</p>
             </div>
             
-            <div id="customFieldsList" class="custom-fields-list">
-              <!-- Custom fields will be added here -->
+            <!-- Schema Browser - Shows all sections and fields -->
+            <div class="schema-browser">
+              <div class="schema-browser-header">
+                <span class="browser-title">📂 Ceding Schema Sections</span>
+                <span id="schemaSectionCount" class="section-count"></span>
+              </div>
+              <div id="schemaSectionsContainer" class="schema-sections-container">
+                <!-- Schema sections will be loaded here dynamically -->
+                <div class="loading-spinner">Loading schema...</div>
+              </div>
             </div>
             
+            <!-- Add Custom Field Form -->
             <div class="add-field-form">
-              <div class="field-inputs">
-                <input type="text" id="newFieldName" class="form-input" placeholder="Field name (e.g., special_bonus)">
-                <select id="newFieldType" class="form-select field-type-select">
-                  <option value="string">Text (String)</option>
-                  <option value="number">Number</option>
-                  <option value="table">Table/Array</option>
-                  <option value="boolean">Yes/No (Boolean)</option>
-                </select>
-                <input type="text" id="newFieldDescription" class="form-input field-desc" placeholder="Description (e.g., Special bonus percentage)">
+              <div class="form-row">
+                <label class="form-label">Add Custom Field</label>
+              </div>
+              <div class="field-inputs-extended">
+                <div class="field-row">
+                  <div class="input-group">
+                    <label class="input-label">Target Section</label>
+                    <select id="targetSection" class="form-select section-select">
+                      <option value="">-- Select Section --</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Field Name</label>
+                    <input type="text" id="newFieldName" class="form-input" placeholder="e.g., special_bonus">
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="input-group">
+                    <label class="input-label">Field Type</label>
+                    <select id="newFieldType" class="form-select field-type-select">
+                      <option value="string">Text (String)</option>
+                      <option value="table">Table/Array</option>
+                      <option value="boolean">Yes/No (Boolean)</option>
+                    </select>
+                  </div>
+                  <div class="input-group flex-grow">
+                    <label class="input-label">Description (AI Prompt)</label>
+                    <input type="text" id="newFieldDescription" class="form-input" placeholder="e.g., Extract the special bonus percentage if mentioned">
+                  </div>
+                </div>
               </div>
               <button type="button" id="addFieldBtn" class="btn btn-add-field">
                 <span class="btn-icon">➕</span>
-                Add Field
+                Add Field to Section
               </button>
+            </div>
+            
+            <!-- Added Custom Fields List -->
+            <div id="customFieldsSection" class="custom-fields-section" style="display: none;">
+              <div class="custom-fields-header">
+                <span>✏️ Your Custom Fields</span>
+                <span id="customFieldCount" class="field-count">0 fields</span>
+              </div>
+              <div id="customFieldsList" class="custom-fields-list">
+                <!-- Custom fields will be added here -->
+              </div>
             </div>
             
             <div class="custom-schema-actions">

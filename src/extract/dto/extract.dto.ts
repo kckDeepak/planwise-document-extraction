@@ -15,5 +15,5 @@ export class ExtractRequestDto {
     @IsString()
     @IsOptional()
     @IsIn(ALLOWED_MODELS, { message: 'Model must be one of: reducto, datalab' })
-    model?: ModelType = 'datalab';
+    model?: ModelType = 'reducto';
 }

@@ -187,25 +187,56 @@ EXTRACTION RULES:
 
     /**
      * Get custom fields from custom_ceding schema (if exists)
+     * Compares with base ceding schema to find added fields
      */
-    async getCustomCedingFields(): Promise<Array<{ name: string; type: string; description: string }>> {
+    async getCustomCedingFields(): Promise<Array<{ name: string; type: string; description: string; section: string }>> {
         const customSchema = await this.getSchema('custom_ceding');
-        if (!customSchema || !customSchema.properties?.custom_fields?.properties) {
+        const baseSchema = await this.getSchema('ceding');
+        
+        if (!customSchema || !customSchema.properties) {
             return [];
         }
 
-        const fields: Array<{ name: string; type: string; description: string }> = [];
+        const fields: Array<{ name: string; type: string; description: string; section: string }> = [];
         
-        for (const [name, value] of Object.entries(customSchema.properties.custom_fields.properties)) {
-            const field = value as any;
-            fields.push({
-                name,
-                type: field.type === 'array' ? 'table' : (field.type || 'string'),
-                description: field.description || name,
-            });
+        // Get base schema field names for comparison
+        const baseFields: Record<string, Set<string>> = {};
+        if (baseSchema?.properties) {
+            for (const [sectionName, sectionValue] of Object.entries(baseSchema.properties)) {
+                const section = sectionValue as any;
+                baseFields[sectionName] = new Set();
+                if (section.properties) {
+                    for (const fieldName of Object.keys(section.properties)) {
+                        baseFields[sectionName].add(fieldName);
+                    }
+                }
+            }
+        }
+
+        // Scan all sections in custom schema for added fields
+        for (const [sectionName, sectionValue] of Object.entries(customSchema.properties)) {
+            const section = sectionValue as any;
+            
+            if (section.type === 'object' && section.properties) {
+                for (const [fieldName, fieldValue] of Object.entries(section.properties)) {
+                    // Check if this field exists in base schema
+                    const isCustomField = !baseFields[sectionName]?.has(fieldName);
+                    
+                    if (isCustomField) {
+                        const field = fieldValue as any;
+                        fields.push({
+                            name: fieldName,
+                            type: field.type === 'array' ? 'table' : (field.type || 'string'),
+                            description: field.description || fieldName,
+                            section: sectionName,
+                        });
+                    }
+                }
+            }
         }
 
         return fields;
     }
 }
+
 

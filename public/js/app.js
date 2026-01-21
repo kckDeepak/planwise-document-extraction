@@ -366,9 +366,13 @@ function displayResults(results, output) {
     // Build table view - show merged extracted data if available
     let tableHTML = '';
 
-    if (output && output.extracted_data) {
+    // Check for merged data in the new production API format: output.data.extractions[0].extractedData
+    // Also fallback to legacy output.extracted_data for backwards compatibility
+    const extractedData = getExtractedData(output);
+
+    if (extractedData) {
         // Show the merged, organized extraction results
-        tableHTML += buildExtractedDataTable(output);
+        tableHTML += buildExtractedDataTable(output, extractedData);
     } else {
         // Fallback to showing raw results per file
         results.forEach(result => {
@@ -395,15 +399,57 @@ function displayResults(results, output) {
     elements.jsonContent.textContent = JSON.stringify(output || results, null, 2);
 }
 
-// Build table for merged extracted data (from output.extracted_data)
-function buildExtractedDataTable(output) {
-    const summary = output.extraction_summary || {};
-    const extractedData = output.extracted_data || {};
+/**
+ * Get the extracted data from the output object.
+ * Handles both new production API format and legacy format.
+ */
+function getExtractedData(output) {
+    if (!output) return null;
+    
+    // New production API format: output.data.extractions[0].extractedData
+    if (output.data && 
+        output.data.extractions && 
+        output.data.extractions.length > 0 && 
+        output.data.extractions[0].extractedData) {
+        return output.data.extractions[0].extractedData;
+    }
+    
+    // Legacy format: output.extracted_data
+    if (output.extracted_data) {
+        return output.extracted_data;
+    }
+    
+    return null;
+}
+
+// Build table for merged extracted data
+function buildExtractedDataTable(output, extractedData) {
+    // Handle summary info from both new and legacy format
+    let totalFieldsExtracted = 0;
+    let successfulDocuments = 0;
+    
+    // New production API format
+    if (output.data && output.data.document) {
+        // Count fields in extracted data
+        totalFieldsExtracted = countFields(extractedData);
+        successfulDocuments = output.data.totalExtractions || 1;
+    } 
+    // Legacy format
+    else if (output.extraction_summary) {
+        const summary = output.extraction_summary;
+        totalFieldsExtracted = summary.total_fields_extracted || 0;
+        successfulDocuments = summary.successful_documents || 0;
+    }
+    // Fallback: count fields
+    else {
+        totalFieldsExtracted = countFields(extractedData);
+        successfulDocuments = 1;
+    }
 
     let html = `
     <div class="result-table-wrapper">
       <div class="result-table-header">
-        📊 Extraction Results (${summary.total_fields_extracted || 0} fields from ${summary.successful_documents || 0} document(s))
+        📊 Merged Extraction Results (${totalFieldsExtracted} fields from ${successfulDocuments} document(s))
         <span class="export-links">
           <a href="/api/export/funds?schema=${elements.schemaSelect?.value || 'ess'}" class="export-link" target="_blank">📥 Funds CSV</a>
         </span>
@@ -430,33 +476,7 @@ function buildExtractedDataTable(output) {
       `;
 
         // Render fields in this section
-        if (sectionData && typeof sectionData === 'object') {
-            for (const [fieldName, fieldData] of Object.entries(sectionData)) {
-                const formattedField = formatFieldName(fieldName);
-
-                if (fieldData && typeof fieldData === 'object') {
-                    const value = fieldData.value;
-                    const confidence = fieldData.confidence;
-                    const isArray = fieldData.is_array;
-
-                    html += `
-                <tr>
-                  <td class="field-name" style="padding-left: 36px;">${escapeHtml(formattedField)}</td>
-                  <td class="field-value">${renderValue(isArray ? value : value)}</td>
-                  <td>${renderConfidence(confidence)}</td>
-                </tr>
-              `;
-                } else {
-                    html += `
-                <tr>
-                  <td class="field-name" style="padding-left: 36px;">${escapeHtml(formattedField)}</td>
-                  <td class="field-value">${renderValue(fieldData)}</td>
-                  <td>${renderConfidence(null)}</td>
-                </tr>
-              `;
-                }
-            }
-        }
+        html += renderSectionFields(sectionData);
     }
 
     html += `
@@ -465,6 +485,95 @@ function buildExtractedDataTable(output) {
     </div>
   `;
 
+    return html;
+}
+
+/**
+ * Count total fields in extracted data (recursive)
+ */
+function countFields(data, count = 0) {
+    if (!data || typeof data !== 'object') return count;
+    
+    for (const [key, value] of Object.entries(data)) {
+        if (Array.isArray(value)) {
+            count += value.length;
+        } else if (value && typeof value === 'object') {
+            // Check if it's a field object (has 'value' property)
+            if ('value' in value) {
+                count++;
+            } else {
+                // Recurse into nested objects
+                count = countFields(value, count);
+            }
+        }
+    }
+    return count;
+}
+
+/**
+ * Render fields in a section (handles nested objects)
+ */
+function renderSectionFields(sectionData, depth = 1) {
+    if (!sectionData || typeof sectionData !== 'object') return '';
+    
+    let html = '';
+    const paddingLeft = depth * 20 + 16;
+    
+    for (const [fieldName, fieldData] of Object.entries(sectionData)) {
+        const formattedField = formatFieldName(fieldName);
+
+        // Handle arrays (like fund_charges, income, etc.)
+        if (Array.isArray(fieldData)) {
+            html += `
+            <tr class="section-row" style="padding-left: ${paddingLeft}px;">
+              <td colspan="3" style="padding-left: ${paddingLeft}px;">${escapeHtml(formattedField)} (${fieldData.length} items)</td>
+            </tr>
+          `;
+            // Render array as table
+            if (fieldData.length > 0) {
+                html += `
+                <tr>
+                  <td colspan="3" style="padding-left: ${paddingLeft + 20}px;">
+                    ${renderArrayAsTable(fieldData)}
+                  </td>
+                </tr>
+              `;
+            }
+        }
+        // Handle field objects with 'value' property (production format)
+        else if (fieldData && typeof fieldData === 'object' && 'value' in fieldData) {
+            const value = fieldData.value;
+            const confidence = fieldData.confidence ?? (fieldData.found ? 0.99 : null);
+            
+            html += `
+            <tr>
+              <td class="field-name" style="padding-left: ${paddingLeft}px;">${escapeHtml(formattedField)}</td>
+              <td class="field-value">${renderValue(value)}</td>
+              <td>${renderConfidence(confidence)}</td>
+            </tr>
+          `;
+        }
+        // Handle nested objects (like personal_information, etc.)
+        else if (fieldData && typeof fieldData === 'object') {
+            html += `
+            <tr class="section-row">
+              <td colspan="3" style="padding-left: ${paddingLeft}px;">${escapeHtml(formattedField)}</td>
+            </tr>
+          `;
+            html += renderSectionFields(fieldData, depth + 1);
+        }
+        // Handle primitive values
+        else {
+            html += `
+            <tr>
+              <td class="field-name" style="padding-left: ${paddingLeft}px;">${escapeHtml(formattedField)}</td>
+              <td class="field-value">${renderValue(fieldData)}</td>
+              <td>${renderConfidence(null)}</td>
+            </tr>
+          `;
+        }
+    }
+    
     return html;
 }
 
@@ -669,12 +778,21 @@ function renderConfidence(confidence) {
         return '<span class="confidence-badge confidence-na">N/A</span>';
     }
 
+    // Handle both 0-1 scale and 0-99 scale
+    // If confidence > 1, it's already in 0-99 scale
+    let percent;
+    if (confidence > 1) {
+        percent = Math.round(confidence);
+    } else {
+        percent = Math.round(confidence * 100);
+    }
+
     let label, cssClass;
 
-    if (confidence >= 0.8) {
+    if (percent >= 80) {
         label = 'High';
         cssClass = 'confidence-high';
-    } else if (confidence >= 0.5) {
+    } else if (percent >= 50) {
         label = 'Medium';
         cssClass = 'confidence-medium';
     } else {
@@ -682,7 +800,6 @@ function renderConfidence(confidence) {
         cssClass = 'confidence-low';
     }
 
-    const percent = Math.round(confidence * 100);
     return `<span class="confidence-badge ${cssClass}">${label} (${percent}%)</span>`;
 }
 
@@ -866,7 +983,12 @@ async function generatePdf() {
 // ============================================
 const customCedingElements = {
     section: document.getElementById('customCedingSection'),
+    sectionsContainer: document.getElementById('schemaSectionsContainer'),
+    sectionCountSpan: document.getElementById('schemaSectionCount'),
+    targetSection: document.getElementById('targetSection'),
     fieldsList: document.getElementById('customFieldsList'),
+    fieldsSection: document.getElementById('customFieldsSection'),
+    fieldCountSpan: document.getElementById('customFieldCount'),
     newFieldName: document.getElementById('newFieldName'),
     newFieldType: document.getElementById('newFieldType'),
     newFieldDescription: document.getElementById('newFieldDescription'),
@@ -875,8 +997,9 @@ const customCedingElements = {
     statusSpan: document.getElementById('customSchemaStatus'),
 };
 
-// Store custom fields
+// Store custom fields and schema sections
 let customFields = [];
+let cedingSchemaSections = [];
 
 // Toggle custom ceding section visibility based on schema selection
 elements.schemaSelect.addEventListener('change', (e) => {
@@ -886,8 +1009,9 @@ elements.schemaSelect.addEventListener('change', (e) => {
         customCedingElements.section.style.display = isCustomCeding ? 'block' : 'none';
     }
     
-    // Load existing custom fields if switching to custom_ceding
+    // Load schema sections and existing custom fields if switching to custom_ceding
     if (isCustomCeding) {
+        loadCedingSchemaSections();
         loadExistingCustomFields();
     }
     
@@ -918,20 +1042,134 @@ if (customCedingElements.newFieldDescription) {
     });
 }
 
-function addCustomField() {
-    const name = customCedingElements.newFieldName.value.trim();
-    const type = customCedingElements.newFieldType.value;
-    const description = customCedingElements.newFieldDescription.value.trim();
+/**
+ * Load ceding schema sections from API
+ */
+async function loadCedingSchemaSections() {
+    try {
+        const response = await fetch('/api/schemas/ceding/fields');
+        const data = await response.json();
+        
+        if (data.sections && data.sections.length > 0) {
+            cedingSchemaSections = data.sections;
+            renderSchemaSections();
+            populateSectionDropdown();
+        } else {
+            if (customCedingElements.sectionsContainer) {
+                customCedingElements.sectionsContainer.innerHTML = `
+                    <div class="empty-fields-message">Failed to load schema sections</div>
+                `;
+            }
+        }
+    } catch (err) {
+        console.error('Failed to load ceding schema sections:', err);
+        if (customCedingElements.sectionsContainer) {
+            customCedingElements.sectionsContainer.innerHTML = `
+                <div class="empty-fields-message">Error loading schema</div>
+            `;
+        }
+    }
+}
+
+/**
+ * Render schema sections in the browser
+ */
+function renderSchemaSections() {
+    if (!customCedingElements.sectionsContainer) return;
     
-    if (!name) {
-        customCedingElements.newFieldName.focus();
+    // Update section count
+    if (customCedingElements.sectionCountSpan) {
+        const totalFields = cedingSchemaSections.reduce((sum, s) => sum + s.fields.length, 0);
+        customCedingElements.sectionCountSpan.textContent = `${cedingSchemaSections.length} sections, ${totalFields} fields`;
+    }
+    
+    const formatSectionName = (name) => {
+        return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    };
+    
+    customCedingElements.sectionsContainer.innerHTML = cedingSchemaSections.map((section, sIndex) => `
+        <div class="schema-section" data-section="${section.name}">
+            <div class="schema-section-header" onclick="toggleSchemaSection(${sIndex})">
+                <span class="section-toggle">▶</span>
+                <span class="section-name">${formatSectionName(section.name)}</span>
+                <span class="section-field-count">${section.fields.length} fields</span>
+            </div>
+            <div class="section-fields" id="section-fields-${sIndex}">
+                ${section.fields.map(field => `
+                    <div class="schema-field">
+                        <span class="field-icon">•</span>
+                        <span class="field-label">${field.name}</span>
+                        <span class="field-type">${field.type}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Toggle schema section expansion
+ */
+function toggleSchemaSection(index) {
+    const sections = document.querySelectorAll('.schema-section');
+    if (sections[index]) {
+        const header = sections[index].querySelector('.schema-section-header');
+        const fields = sections[index].querySelector('.section-fields');
+        
+        if (header && fields) {
+            header.classList.toggle('active');
+            fields.classList.toggle('expanded');
+        }
+    }
+}
+window.toggleSchemaSection = toggleSchemaSection;
+
+/**
+ * Populate section dropdown for target selection
+ */
+function populateSectionDropdown() {
+    if (!customCedingElements.targetSection) return;
+    
+    const formatSectionName = (name) => {
+        return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    };
+    
+    customCedingElements.targetSection.innerHTML = `
+        <option value="">-- Select Section --</option>
+        ${cedingSchemaSections.map(section => `
+            <option value="${section.name}">${formatSectionName(section.name)} (${section.fields.length} fields)</option>
+        `).join('')}
+    `;
+}
+
+/**
+ * Add a custom field
+ */
+function addCustomField() {
+    const section = customCedingElements.targetSection?.value;
+    const name = customCedingElements.newFieldName?.value.trim();
+    const type = customCedingElements.newFieldType?.value || 'string';
+    const description = customCedingElements.newFieldDescription?.value.trim();
+    
+    // Validation
+    if (!section) {
+        setSchemaStatus('error', 'Please select a target section');
+        customCedingElements.targetSection?.focus();
         return;
     }
     
-    // Check for duplicate
+    if (!name) {
+        setSchemaStatus('error', 'Please enter a field name');
+        customCedingElements.newFieldName?.focus();
+        return;
+    }
+    
+    // Sanitize name
     const sanitizedName = name.toLowerCase().replace(/[^a-z0-9_]/g, '_');
-    if (customFields.some(f => f.name === sanitizedName)) {
-        setSchemaStatus('error', `Field "${name}" already exists`);
+    
+    // Check for duplicate
+    if (customFields.some(f => f.name === sanitizedName && f.section === section)) {
+        setSchemaStatus('error', `Field "${name}" already exists in this section`);
         return;
     }
     
@@ -941,6 +1179,7 @@ function addCustomField() {
         type,
         description: description || name,
         displayName: name,
+        section,
     });
     
     // Clear inputs
@@ -948,25 +1187,45 @@ function addCustomField() {
     customCedingElements.newFieldDescription.value = '';
     customCedingElements.newFieldName.focus();
     
-    // Render list
+    // Render list and show section
     renderCustomFieldsList();
     updateSaveButtonState();
-    setSchemaStatus('', '');
+    setSchemaStatus('success', `Added "${name}" to ${section.replace(/_/g, ' ')}`);
 }
 
+/**
+ * Remove a custom field
+ */
 function removeCustomField(index) {
-    customFields.splice(index, 1);
+    const removed = customFields.splice(index, 1)[0];
     renderCustomFieldsList();
     updateSaveButtonState();
+    if (removed) {
+        setSchemaStatus('', `Removed "${removed.displayName || removed.name}"`);
+    }
 }
+window.removeCustomField = removeCustomField;
 
+/**
+ * Render the list of custom fields added by user
+ */
 function renderCustomFieldsList() {
+    // Show/hide custom fields section
+    if (customCedingElements.fieldsSection) {
+        customCedingElements.fieldsSection.style.display = customFields.length > 0 ? 'block' : 'none';
+    }
+    
+    // Update field count
+    if (customCedingElements.fieldCountSpan) {
+        customCedingElements.fieldCountSpan.textContent = `${customFields.length} field${customFields.length !== 1 ? 's' : ''}`;
+    }
+    
     if (!customCedingElements.fieldsList) return;
     
     if (customFields.length === 0) {
         customCedingElements.fieldsList.innerHTML = `
             <div class="empty-fields-message">
-                No custom fields added yet. Add fields above to extend the ceding schema.
+                No custom fields added yet
             </div>
         `;
         return;
@@ -980,11 +1239,16 @@ function renderCustomFieldsList() {
         'array': 'Table',
     };
     
+    const formatSectionName = (name) => {
+        return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    };
+    
     customCedingElements.fieldsList.innerHTML = customFields.map((field, index) => `
         <div class="custom-field-item">
             <div class="field-info">
                 <span class="field-name">${escapeHtml(field.displayName || field.name)}</span>
                 <div class="field-meta">
+                    <span class="field-section-badge">${formatSectionName(field.section || 'custom_fields')}</span>
                     <span class="field-type-badge">${typeLabels[field.type] || field.type}</span>
                     <span>${escapeHtml(field.description)}</span>
                 </div>
@@ -996,12 +1260,18 @@ function renderCustomFieldsList() {
     `).join('');
 }
 
+/**
+ * Update save button state
+ */
 function updateSaveButtonState() {
     if (customCedingElements.saveSchemaBtn) {
         customCedingElements.saveSchemaBtn.disabled = customFields.length === 0;
     }
 }
 
+/**
+ * Save custom schema to backend
+ */
 async function saveCustomSchema() {
     if (customFields.length === 0) {
         setSchemaStatus('error', 'Add at least one custom field');
@@ -1022,6 +1292,7 @@ async function saveCustomSchema() {
                     name: f.name,
                     type: f.type,
                     description: f.description,
+                    section: f.section,
                 })),
             }),
         });
@@ -1043,6 +1314,9 @@ async function saveCustomSchema() {
     }
 }
 
+/**
+ * Load existing custom fields from backend
+ */
 async function loadExistingCustomFields() {
     try {
         const response = await fetch('/api/schemas/custom-ceding/fields');
@@ -1054,6 +1328,7 @@ async function loadExistingCustomFields() {
                 type: f.type,
                 description: f.description,
                 displayName: f.name.replace(/_/g, ' '),
+                section: f.section || 'custom_fields',
             }));
             renderCustomFieldsList();
             updateSaveButtonState();
@@ -1071,15 +1346,24 @@ async function loadExistingCustomFields() {
     }
 }
 
+/**
+ * Set schema status message
+ */
 function setSchemaStatus(type, message) {
     if (customCedingElements.statusSpan) {
         customCedingElements.statusSpan.textContent = message;
         customCedingElements.statusSpan.className = 'schema-status' + (type ? ` ${type}` : '');
+        
+        // Auto-clear success messages after 3 seconds
+        if (type === 'success' || !type) {
+            setTimeout(() => {
+                if (customCedingElements.statusSpan.textContent === message) {
+                    customCedingElements.statusSpan.textContent = '';
+                }
+            }, 5000);
+        }
     }
 }
-
-// Make removeCustomField globally accessible for onclick
-window.removeCustomField = removeCustomField;
 
 // ============================================
 // Initialize
@@ -1087,4 +1371,5 @@ window.removeCustomField = removeCustomField;
 loadSchemas();
 updateFileCount();
 renderCustomFieldsList();
+
 
