@@ -6,6 +6,7 @@ interface CustomField {
     type: string;
     description: string;
     section?: string;
+    columns?: Array<{ name: string; type: string; description: string }>;
 }
 
 @Controller('api/schemas')

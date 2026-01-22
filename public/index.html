@@ -72,25 +72,40 @@
           <div id="customCedingSection" class="custom-ceding-section" style="display: none;">
             <div class="custom-ceding-header">
               <h3>📝 Customize Ceding Schema</h3>
-              <p>Browse existing sections and add your custom fields to any section</p>
+              <p>Add custom fields to the ceding schema and see your changes in real-time</p>
             </div>
             
-            <!-- Schema Browser - Shows all sections and fields -->
-            <div class="schema-browser">
-              <div class="schema-browser-header">
-                <span class="browser-title">📂 Ceding Schema Sections</span>
-                <span id="schemaSectionCount" class="section-count"></span>
+            <!-- Workflow Steps -->
+            <div class="workflow-steps">
+              <div class="workflow-step" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <span class="step-title">Add Fields</span>
+                  <span class="step-desc">Define your custom fields</span>
+                </div>
               </div>
-              <div id="schemaSectionsContainer" class="schema-sections-container">
-                <!-- Schema sections will be loaded here dynamically -->
-                <div class="loading-spinner">Loading schema...</div>
+              <div class="workflow-connector"></div>
+              <div class="workflow-step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <span class="step-title">Save Schema</span>
+                  <span class="step-desc">Apply your changes</span>
+                </div>
+              </div>
+              <div class="workflow-connector"></div>
+              <div class="workflow-step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <span class="step-title">Extract Data</span>
+                  <span class="step-desc">Run extraction</span>
+                </div>
               </div>
             </div>
             
             <!-- Add Custom Field Form -->
             <div class="add-field-form">
               <div class="form-row">
-                <label class="form-label">Add Custom Field</label>
+                <label class="form-label"><span class="label-icon">➕</span> Add Custom Field</label>
               </div>
               <div class="field-inputs-extended">
                 <div class="field-row">
@@ -115,9 +130,24 @@
                     </select>
                   </div>
                   <div class="input-group flex-grow">
-                    <label class="input-label">Description (AI Prompt)</label>
+                    <label class="input-label">Table/Field Description (AI Prompt)</label>
                     <input type="text" id="newFieldDescription" class="form-input" placeholder="e.g., Extract the special bonus percentage if mentioned">
                   </div>
+                </div>
+                
+                <!-- Table Columns Builder (shown when Table type is selected) -->
+                <div id="tableColumnsBuilder" class="table-columns-builder" style="display: none;">
+                  <div class="columns-header">
+                    <span class="columns-icon">📊</span>
+                    <span class="columns-title">Define Table Columns</span>
+                    <span class="columns-hint">Each column will be extracted as a property of each row</span>
+                  </div>
+                  <div id="tableColumnsContainer" class="table-columns-container">
+                    <!-- Dynamic column rows will be added here -->
+                  </div>
+                  <button type="button" id="addColumnBtn" class="btn btn-add-column">
+                    <span class="btn-icon">➕</span> Add Column
+                  </button>
                 </div>
               </div>
               <button type="button" id="addFieldBtn" class="btn btn-add-field">
@@ -126,23 +156,47 @@
               </button>
             </div>
             
-            <!-- Added Custom Fields List -->
-            <div id="customFieldsSection" class="custom-fields-section" style="display: none;">
-              <div class="custom-fields-header">
-                <span>✏️ Your Custom Fields</span>
-                <span id="customFieldCount" class="field-count">0 fields</span>
+            <!-- Live Schema Preview with Custom Fields Highlighted -->
+            <div class="schema-preview-panel">
+              <div class="schema-preview-header">
+                <div class="preview-title-section">
+                  <span class="preview-icon">📋</span>
+                  <span class="preview-title">Your Custom Schema Preview</span>
+                </div>
+                <div class="preview-badges">
+                  <span id="totalSectionsCount" class="preview-badge sections">0 sections</span>
+                  <span id="totalFieldsCount" class="preview-badge fields">0 fields</span>
+                  <span id="customFieldsBadge" class="preview-badge custom" style="display: none;">+0 custom</span>
+                </div>
               </div>
-              <div id="customFieldsList" class="custom-fields-list">
-                <!-- Custom fields will be added here -->
+              <div id="schemaPreviewContainer" class="schema-preview-container">
+                <!-- Schema with custom fields highlighted will appear here -->
+                <div class="loading-spinner">Loading schema...</div>
+              </div>
+              <div id="schemaSuccessNotice" class="schema-success-notice" style="display: none;">
+                <span class="success-icon">✅</span>
+                <span class="success-text">Schema saved successfully! Your custom fields are ready for extraction.</span>
               </div>
             </div>
             
+            <!-- Action Buttons with Status -->
             <div class="custom-schema-actions">
               <button type="button" id="saveCustomSchemaBtn" class="btn btn-primary btn-save-schema" disabled>
                 <span class="btn-icon">💾</span>
                 Save Custom Schema
               </button>
               <span id="customSchemaStatus" class="schema-status"></span>
+            </div>
+            
+            <!-- Schema Ready Indicator -->
+            <div id="schemaReadyIndicator" class="schema-ready-indicator" style="display: none;">
+              <div class="ready-content">
+                <span class="ready-icon">🚀</span>
+                <div class="ready-text">
+                  <strong>Schema is ready!</strong>
+                  <span>Upload your documents and click "Extract Data" to begin extraction with your custom schema.</span>
+                </div>
+              </div>
             </div>
           </div>
 

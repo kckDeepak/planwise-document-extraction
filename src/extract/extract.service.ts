@@ -125,6 +125,9 @@ export class ExtractService {
         // Load schema-specific system prompt
         const systemPrompt = await this.schemaService.getSystemPrompt(schemaName);
 
+        // Load field type map for output
+        const fieldTypeMap = await this.schemaService.getFieldTypeMap(schemaName);
+
         const apiKey = this.configService.get<string>('REDUCTO_API_KEY');
         if (!apiKey) {
             sendEvent('error', { message: 'REDUCTO_API_KEY not configured' });
@@ -260,7 +263,7 @@ export class ExtractService {
             });
 
             const mergedFields = this.mergeExtractions(results);
-            const output = this.createOutput(mergedFields, results, schemaName);
+            const output = this.createOutput(mergedFields, results, schemaName, fieldTypeMap);
 
             // Save output with timestamp (Issue #5)
             const serviceOutputFolder = path.join(this.outputFolder, 'reducto', schemaName);
@@ -290,7 +293,7 @@ export class ExtractService {
                 for (const result of results) {
                     if (result.status === 'success') {
                         const singleMerged = this.mergeExtractions([result]);
-                        const singleOutput = this.createOutput(singleMerged, [result], schemaName);
+                        const singleOutput = this.createOutput(singleMerged, [result], schemaName, fieldTypeMap);
                         const fileBaseName = path.basename(
                             result.file,
                             path.extname(result.file),
@@ -545,14 +548,31 @@ export class ExtractService {
         mergedFields: Record<string, FieldData>,
         results: ExtractionResult[],
         schemaName: string = 'cfr',
+        fieldTypeMap: Record<string, string> = {},
     ): any {
         const successful = results.filter((r) => r.status === 'success');
         const fileName = successful.length > 0 ? successful[0].file : null;
 
         const extractedData: Record<string, any> = {};
-        const sortedKeys = Object.keys(mergedFields).sort();
         const sectionSequences: Record<string, number> = {};
 
+        // Helper function to create a field entry with "Not Stated" value
+        const createNotStatedField = (fieldPath: string, fieldType: string, sequence: number, source: string | null) => ({
+            value: 'Not Stated',
+            field_type: fieldType,
+            page_number: null,
+            sequence,
+            found: false,
+            confidence: 0,
+            source: source,
+            status: 'not_found',
+            description: '',
+            citation: [],
+            other_cited_pages: [],
+        });
+
+        // First, add all extracted fields
+        const sortedKeys = Object.keys(mergedFields).sort();
         for (const fieldPath of sortedKeys) {
             const fieldData = mergedFields[fieldPath];
             const parts = fieldPath.split('.');
@@ -574,14 +594,19 @@ export class ExtractService {
             }
             const sequence = sectionSequences[sectionPath]++;
 
-            // Set the final field value in cfr_output.json format
+            // Set the final field value
             const fieldName = parts[parts.length - 1];
+            
+            // Get field type from schema, default to 'text'
+            const fieldType = fieldTypeMap[fieldPath] || 'text';
+            
             if (fieldData.is_array) {
-                // Arrays are already processed with the correct structure
-                current[fieldName] = fieldData.value;
+                current[fieldName] = {
+                    items: fieldData.value,
+                    field_type: 'table',
+                };
             } else {
                 const hasValue = fieldData.value !== null && fieldData.value !== undefined;
-                // Convert confidence to 0-99 scale, default to 99 if not provided
                 let confidence = 99;
                 if (fieldData.confidence !== null && fieldData.confidence !== undefined) {
                     confidence = Math.round(fieldData.confidence * 100);
@@ -589,6 +614,7 @@ export class ExtractService {
 
                 current[fieldName] = {
                     value: fieldData.value,
+                    field_type: fieldType,
                     page_number: fieldData.page,
                     sequence,
                     found: hasValue,
@@ -599,6 +625,54 @@ export class ExtractService {
                     citation: fieldData.bbox ? [fieldData.bbox] : [],
                     other_cited_pages: [],
                 };
+            }
+        }
+
+        // Now, add "Not Stated" entries for all fields in the fieldTypeMap that weren't extracted
+        for (const [fieldPath, fieldType] of Object.entries(fieldTypeMap)) {
+            const parts = fieldPath.split('.');
+            
+            // Check if this field already exists in extractedData
+            let exists = true;
+            let current: any = extractedData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!current[parts[i]]) {
+                    exists = false;
+                    break;
+                }
+                current = current[parts[i]];
+            }
+            
+            if (exists && current[parts[parts.length - 1]]) {
+                // Field already exists, skip
+                continue;
+            }
+
+            // Field doesn't exist, add it with "Not Stated"
+            current = extractedData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                const part = parts[i];
+                if (!current[part]) {
+                    current[part] = {};
+                }
+                current = current[part];
+            }
+
+            const sectionPath = parts.slice(0, -1).join('.');
+            if (!sectionSequences[sectionPath]) {
+                sectionSequences[sectionPath] = 1;
+            }
+            const sequence = sectionSequences[sectionPath]++;
+
+            const fieldName = parts[parts.length - 1];
+            
+            if (fieldType === 'table') {
+                current[fieldName] = {
+                    items: [],
+                    field_type: 'table',
+                };
+            } else {
+                current[fieldName] = createNotStatedField(fieldPath, fieldType, sequence, fileName);
             }
         }
 
