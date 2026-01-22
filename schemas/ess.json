@@ -9,7 +9,7 @@
             "properties": {
                 "provider": {
                     "type": "string",
-                    "description": "Name of the pension provider or scheme administrator(Aviva, Legal &General, Standard Life, etc..)"
+                    "description": "Name of the pension provider or scheme administration company (Aviva, Legal & General, Standard Life, etc.)"
                 },
                 "contactNumberAndEmail": {
                     "type": "string",
@@ -29,62 +29,325 @@
                 },
                 "retirementDateAge": {
                     "type": "string",
-                    "description": "Planned retirement date or age for the pension plan or nominated pension age for the pension plan"
+                    "description": "Planned retirement date or nominated pension age for the pension plan (Date or Number/Age)"
                 },
                 "employerName": {
                     "type": "string",
                     "description": "Name of the employer sponsoring the scheme"
-                }
-            }
-        },
-        "fund_values": {
-            "type": "object",
-            "description": "Current fund and transfer values",
-            "properties": {
+                },
                 "currentValueDate": {
                     "type": "string",
-                    "description": "Current value of the pension plan and the date of valuation"
+                    "description": "Current value of the pension plan and the date of valuation (Currency GBP & DD/MM/YYYY)"
                 },
                 "transferValueDate": {
                     "type": "string",
-                    "description": "Transfer value amount and the date of the transfer value quote"
+                    "description": "Transfer value amount and the date of the transfer value quote (Currency GBP & DD/MM/YYYY)"
                 },
                 "deathValueIfDiff": {
                     "type": "string",
-                    "description": "Death benefit value if different from the transfer value"
+                    "description": "Death benefit value if different from the transfer value (Currency GBP)"
                 },
                 "fundsInvestedInAndValues": {
-                    "type": "string",
-                    "description": "Table or list of individual funds, holdings or shares that the pension is invested in and their current values. There may be Fund Management Charges or AMC/FMC/TER attached to"
+                    "type": "array",
+                    "description": "List of individual funds, holdings or shares that the pension is invested in and their current values",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "fundName": {
+                                "type": "string",
+                                "description": "Name of the fund"
+                            },
+                            "currentFundValue": {
+                                "type": "string",
+                                "description": "Current value of the fund (Currency GBP)"
+                            },
+                            "amcTer": {
+                                "type": "string",
+                                "description": "Annual Management Charge (AMC) or Total Expense Ratio (TER) (Percentage)"
+                            }
+                        }
+                    }
                 }
             }
         },
-        "fund_holdings": {
-            "type": "array",
-            "description": "Current fund holdings - ONLY extract funds the client is invested in with their values",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "fundName": {
-                        "type": "string",
-                        "description": "Name of the fund held in the policy"
-                    },
-                    "fundValue": {
-                        "type": "string",
-                        "description": "Current value of the fund in GBP"
-                    },
-                    "allocation": {
-                        "type": "string",
-                        "description": "Allocation percentage"
-                    },
-                    "units": {
-                        "type": "string",
-                        "description": "Number of units held"
-                    },
-                    "unitPrice": {
-                        "type": "string",
-                        "description": "Unit price in GBP"
+        "flexibility_and_withdrawals": {
+            "type": "object",
+            "description": "Withdrawal and flexibility options",
+            "properties": {
+                "flexiAccessDrawdown": {
+                    "type": "string",
+                    "description": "Whether flexi-access drawdown is available on the plan. Flexible Income Drawdown. Income Drawdown. Drawdown. FAD. If the plan must be transferred to another scheme to get Flexible Access Drawdown benefits, then this is 'NO' (Yes/No)"
+                },
+                "ufpls": {
+                    "type": "string",
+                    "description": "Whether UFPLS (Uncrystallised Funds Pension Lump Sum) is available, on a FULL encashment basis (Yes/No)"
+                },
+                "partialUfplsAvailable": {
+                    "type": "string",
+                    "description": "Whether partial UFPLS withdrawals are available (Yes/No)"
+                },
+                "earlyWithdrawalChargeTransferPenaltyExitCost": {
+                    "type": "string",
+                    "description": "Details of any transfer penalties, Early Withdrawal Charges (EWC), exit costs, exit fees, Early Claim Charge, etc. that apply (Text/Currency)"
+                },
+                "transferPenaltyEndDate": {
+                    "type": "string",
+                    "description": "Date when transfer penalties will end or reduce (DD/MM/YYYY)"
+                }
+            }
+        },
+        "contributions": {
+            "type": "object",
+            "description": "Current contribution details",
+            "properties": {
+                "currentRegularsOrDatePaidUp": {
+                    "type": "string",
+                    "description": "Current regular contribution amount or date when contributions were paid up. Contributions are either personally paid or employer paid (GROSS per month £). Regular contributions are regarded as 'Current' if the last regular payment is dated within 6 months of the date the plan information was created (Currency GBP or DD/MM/YYYY)"
+                },
+                "dateOfLastContribution": {
+                    "type": "string",
+                    "description": "Date of the last contribution made to the plan (DD/MM/YYYY)"
+                },
+                "totalContributionsIn": {
+                    "type": "string",
+                    "description": "Table showing total contributions made into the plan"
+                },
+                "percentOfContributionIntoEachFund": {
+                    "type": "string",
+                    "description": "Table showing percentage allocation of contributions into each separate fund the client is investing in"
+                },
+                "dateRegularsArePaid": {
+                    "type": "string",
+                    "description": "Date when regular contributions are paid (e.g., monthly, annually)"
+                },
+                "indexationOnRegulars": {
+                    "type": "string",
+                    "description": "Details of indexation, escalation or increase applied to regular contributions (Text/Percentage)"
+                },
+                "annualReviewDayAndMonthIndexation": {
+                    "type": "string",
+                    "description": "Annual review day and month for indexation increases (DD/MM)"
+                },
+                "annualRateOfIndexationIncrease": {
+                    "type": "string",
+                    "description": "Annual rate of indexation increase percentage"
+                },
+                "waiverOfContribution": {
+                    "type": "string",
+                    "description": "Whether waiver of contribution, WOC or Waiver of premium benefit is available (Yes/No)"
+                },
+                "monthlyCostOfWaiver": {
+                    "type": "string",
+                    "description": "Monthly cost of the waiver of contribution benefit (Currency GBP)"
+                },
+                "employeeContribution": {
+                    "type": "string",
+                    "description": "Employee contribution amount or percentage"
+                },
+                "employerContribution": {
+                    "type": "string",
+                    "description": "Employer contribution amount or percentage"
+                },
+                "totalContribution": {
+                    "type": "string",
+                    "description": "Total combined contribution"
+                },
+                "contributionFrequency": {
+                    "type": "string",
+                    "description": "Frequency of contributions (e.g., Monthly, Annual)"
+                }
+            },
+            "contribution_history": {
+                "type": "array",
+                "description": "Extract ALL contributions from inception to current date - every contribution made to this policy",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "date": {
+                            "type": "string",
+                            "description": "Date of contribution"
+                        },
+                        "amount": {
+                            "type": "string",
+                            "description": "Contribution amount"
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Type (Employee/Employer/Transfer)"
+                        }
                     }
+                }
+            }
+        },
+        "transfers_and_guarantees": {
+            "type": "object",
+            "description": "Transfers in and guarantee details",
+            "properties": {
+                "transfersInOrLumpSumContributions": {
+                    "type": "string",
+                    "description": "Details of transfers in or lump sum contributions made. Payments which were Transfer In Payments (Text/Table)"
+                },
+                "bulkBlockTransfer": {
+                    "type": "string",
+                    "description": "Whether transfers were part of a bulk or block transfer arrangement (Yes/No)"
+                },
+                "aDayValueTfc": {
+                    "type": "string",
+                    "description": "For Pensions with a Start Date before A-day, i.e. 06/04/2006, the value of the Tax Free Cash Lump Sum Entitlement as of that day for the pension. For plans that started pre A-Day, the Tax Free Cash may be 'Protected' i.e. over the standard 25% (Currency GBP)"
+                },
+                "aDayFundValue": {
+                    "type": "string",
+                    "description": "For Pensions with a Start Date before A-day, i.e. 06/04/2006, the value of the Pension itself as of that day (Currency GBP)"
+                },
+                "aDayTaxFreeValue": {
+                    "type": "string",
+                    "description": "The Tax Free Cash as of A-Day (Currency GBP)"
+                },
+                "enhancedTfcCheck": {
+                    "type": "string",
+                    "description": "Whether the plan has 'Protected' or 'Enhanced' Tax Free Cash, i.e. Tax Free Cash entitlement of ABOVE 25% (Yes/No)"
+                },
+                "garGmpOtherGuarantees": {
+                    "type": "string",
+                    "description": "Details of any Guaranteed Annuity Rate (GAR), Guaranteed Minimum Pension (GMP), or other guarantees, or Safeguarded Benefits (Text Multi-line)"
+                },
+                "garGuarantee": {
+                    "type": "string",
+                    "description": "Guaranteed Annuity Rate (GAR) guarantee details"
+                },
+                "gmpGuarantee": {
+                    "type": "string",
+                    "description": "Guaranteed Minimum Pension (GMP) guarantee details"
+                },
+                "rstGuarantee": {
+                    "type": "string",
+                    "description": "RST (Reversionary Surrender Terms) guarantee details"
+                },
+                "generalGuarantee": {
+                    "type": "string",
+                    "description": "General guarantee information and details for Safeguarded benefits"
+                },
+                "lifeCover": {
+                    "type": "string",
+                    "description": "Details of life cover benefits attached to the pension plan"
+                }
+            }
+        },
+        "fund_info": {
+            "type": "object",
+            "description": "Fund availability and switching information",
+            "properties": {
+                "numberOfFundsAvailable": {
+                    "type": "string",
+                    "description": "Total number of funds available for investment"
+                },
+                "numberOfFundManagers": {
+                    "type": "string",
+                    "description": "Number of different fund managers available"
+                },
+                "maxFundsAtOneTime": {
+                    "type": "string",
+                    "description": "Maximum number of funds that can be held at one time"
+                },
+                "fundSwitches": {
+                    "type": "string",
+                    "description": "Details of fund switching options and any restrictions"
+                },
+                "origoOptionsCase": {
+                    "type": "string",
+                    "description": "Whether the plan supports Origo Options for electronic transfers (Yes/No)"
+                }
+            }
+        },
+        "with_profits": {
+            "type": "object",
+            "description": "With-profits fund information",
+            "properties": {
+                "withProfits": {
+                    "type": "string",
+                    "description": "Whether the plan includes with-profits investments (Yes/No)"
+                },
+                "terminalFinalBonus": {
+                    "type": "string",
+                    "description": "Details of terminal or final bonus arrangements (Text/Percentage)"
+                },
+                "mva": {
+                    "type": "string",
+                    "description": "MVA or sometime MVR (Market Value Reduction) is essentially a Transfer Penalty or Reduction which reduces With Profits funds on Transfer (Text/Percentage/Currency GBP)"
+                },
+                "mvaFreeDate": {
+                    "type": "string",
+                    "description": "Date when MVA will no longer apply (DD/MM/YYYY)"
+                },
+                "wpBonusRate": {
+                    "type": "string",
+                    "description": "Current with-profits bonus rate (Percentage)"
+                },
+                "bonusHistoryLast5Years": {
+                    "type": "string",
+                    "description": "Bonus history for the last 5 years (Text/Table)"
+                },
+                "guarantees": {
+                    "type": "string",
+                    "description": "Details of any guarantees (bonus rate, minimum annuity, reversionary bonus, cash sum) (Text Multi-line)"
+                },
+                "guaranteeCostCharge": {
+                    "type": "string",
+                    "description": "Cost charge for any guarantees provided (Currency GBP)"
+                }
+            }
+        },
+        "projections": {
+            "type": "object",
+            "description": "Pension projections and growth estimates",
+            "properties": {
+                "paidUpProjectionsToSra": {
+                    "type": "string",
+                    "description": "Projections or Illustrations of the Pension Value to the client's State Retirement Age (SRA) (65, 67 etc). For pensions that are receiving current regular contributions this will be the projection on a 'Ceased' or 'Paid Up' basis (Text/Table/Currency GBP)"
+                },
+                "regularsContinuingProjectionsToSra": {
+                    "type": "string",
+                    "description": "Projections or Illustrations of the Pension Value to the client's State Retirement Age (SRA) (65, 67 etc). For pensions that are receiving current regular contributions this will be the projection on a 'Continuing' basis i.e. presuming the payments will continue to retirement age (Text/Table/Currency GBP)"
+                },
+                "projectionStartDate": {
+                    "type": "string",
+                    "description": "The date the projection was created (DD/MM/YYYY)"
+                },
+                "projectionEndDate": {
+                    "type": "string",
+                    "description": "The date the Projection is to, usually Selected Retirement Age (SRA) (DD/MM/YYYY)"
+                },
+                "projectionGrowthRate": {
+                    "type": "string",
+                    "description": "The Growth Rate of the Projection (always select the Medium Rate), will be a percentage. Look for the Average Mid Growth Rate. If no Average Rate, then individual funds will have growth Rates (Percentage)"
+                },
+                "inflationRate": {
+                    "type": "string",
+                    "description": "The Rate of Inflation presumed on the Projection (usually 2%) (Percentage)"
+                },
+                "isLifestylingApplied": {
+                    "type": "string",
+                    "description": "Whether lifestyling or a lifestyle profile is applicable on the plan (Yes/No)"
+                },
+                "ifLifestylingOverallGrowthRate": {
+                    "type": "string",
+                    "description": "Overall growth rate used in projections if lifestyling is applied (Percentage)"
+                },
+                "partialTransferPossible": {
+                    "type": "string",
+                    "description": "Whether partial transfers are possible from the plan (Yes/No)"
+                },
+                "chargingStructureAlterIfContributionsCease": {
+                    "type": "string",
+                    "description": "Whether the charging structure would change if contributions cease (Yes/No)"
+                },
+                "canClientTransferFundButStillContribute": {
+                    "type": "string",
+                    "description": "Whether client can transfer fund away but continue making contributions (Yes/No)"
+                },
+                "contributionsHistoryReceived": {
+                    "type": "string",
+                    "description": "Whether a contributions history has been received (Yes/No)"
                 }
             }
         },
@@ -94,7 +357,39 @@
             "properties": {
                 "annualManagementCharge": {
                     "type": "string",
-                    "description": "The Annual Management Charge (AMC) percentage (%). This might be called Annual Charge, Annual Fee, Plan Charge, it could be a charge for the pension itself or on individual funds"
+                    "description": "The Annual Management Charge (AMC) percentage (%). This might be called, Annual Charge, Annual Fee, Plan Charge, it could be a charge for the pension itself or on individual funds (Percentage)"
+                },
+                "ongoingAdviserCharges": {
+                    "type": "string",
+                    "description": "Ongoing adviser charges percentage (OAC) (Percentage)"
+                },
+                "planChargePolicyFee": {
+                    "type": "string",
+                    "description": "Plan charge or policy fee amount (Currency GBP)"
+                },
+                "fundFactsheetsSavedInFile": {
+                    "type": "string",
+                    "description": "Whether fund factsheets have been saved in the file (Yes/No)"
+                },
+                "initialChargesPaidLast3Years": {
+                    "type": "string",
+                    "description": "Initial charges paid in the last 3 years (adviser and non-adviser) (Currency GBP)"
+                },
+                "loyaltyBonus": {
+                    "type": "string",
+                    "description": "Loyalty bonus percentage or amount (Percentage/Currency GBP)"
+                },
+                "chargeDiscountsRebates": {
+                    "type": "string",
+                    "description": "Any charge discounts or rebates available (Text/Percentage)"
+                },
+                "bidOfferSpread": {
+                    "type": "string",
+                    "description": "Bid/Offer spread percentage (Percentage)"
+                },
+                "allocationRate": {
+                    "type": "string",
+                    "description": "Allocation rate percentage for contributions (Percentage)"
                 },
                 "totalExpenseRatio": {
                     "type": "string",
@@ -119,38 +414,6 @@
                 "otherCharges": {
                     "type": "string",
                     "description": "Any other charges or fees"
-                },
-                "ongoingAdviserCharges": {
-                    "type": "string",
-                    "description": "Ongoing adviser charges percentage"
-                },
-                "planChargePolicyFee": {
-                    "type": "string",
-                    "description": "Plan charge or policy fee amount"
-                },
-                "fundFactsheetsSavedInFile": {
-                    "type": "string",
-                    "description": "Whether fund factsheets have been saved in the file"
-                },
-                "initialChargesPaidLast3Years": {
-                    "type": "string",
-                    "description": "Initial charges paid in the last 3 years (adviser and non-adviser)"
-                },
-                "loyaltyBonus": {
-                    "type": "string",
-                    "description": "Loyalty bonus percentage or amount"
-                },
-                "chargeDiscountsRebates": {
-                    "type": "string",
-                    "description": "Any charge discounts or rebates available"
-                },
-                "bidOfferSpread": {
-                    "type": "string",
-                    "description": "Bid/Offer spread percentage"
-                },
-                "allocationRate": {
-                    "type": "string",
-                    "description": "Allocation rate percentage for contributions"
                 }
             }
         },
@@ -191,140 +454,226 @@
                 ]
             }
         },
-        "contributions": {
+        "ess_specific": {
             "type": "object",
-            "description": "Current contribution details",
+            "description": "ESS-specific information",
             "properties": {
-                "employeeContribution": {
+                "currentEssProvider": {
                     "type": "string",
-                    "description": "Employee contribution amount or percentage"
+                    "description": "Name of the current ESS (Employer-Sponsored Scheme) provider"
                 },
-                "employerContribution": {
+                "isSchemeADb": {
                     "type": "string",
-                    "description": "Employer contribution amount or percentage"
+                    "description": "Whether the scheme is a Defined Benefit (DB) scheme (Yes/No)"
                 },
-                "totalContribution": {
+                "memberWithinLast12Months": {
                     "type": "string",
-                    "description": "Total combined contribution"
+                    "description": "Whether the client became a member within the last 12 months (Yes/No)"
                 },
-                "contributionFrequency": {
+                "availableAvcDcPlanLinked": {
                     "type": "string",
-                    "description": "Frequency of contributions (e.g., Monthly, Annual)"
+                    "description": "Whether there is an available AVC or DC plan linked to the scheme (Yes/No)"
                 },
-                "lastContributionDate": {
+                "canTfcBeCommutedFromAvcDcToPreserveDb": {
                     "type": "string",
-                    "description": "Date of last contribution (DD/MM/YYYY)"
+                    "description": "Whether TFC can be commuted from AVC/DC to preserve DB benefits (Yes/No)"
                 },
-                "currentRegularsOrDatePaidUp": {
+                "schemeAcceptTransfersIn": {
                     "type": "string",
-                    "description": "Current regular contribution amount or date when contributions were paid up. Contributions are either personally paid or employer paid (GROSS per month £). Regular contributions are regarded as Current if the last regular payment is dated within 6 months of the date the plan information was created"
-                },
-                "dateOfLastContribution": {
-                    "type": "string",
-                    "description": "Date of the last contribution made to the plan"
-                },
-                "totalContributionsIn": {
-                    "type": "string",
-                    "description": "Table showing total contributions made into the plan"
-                },
-                "percentOfContributionIntoEachFund": {
-                    "type": "string",
-                    "description": "Table showing percentage allocation of contributions into each fund"
-                },
-                "dateRegularsArePaid": {
-                    "type": "string",
-                    "description": "Date when regular contributions are paid (e.g., monthly, annually)"
-                },
-                "indexationOnRegulars": {
-                    "type": "string",
-                    "description": "Details of indexation, escalation or increase applied to regular contributions"
-                },
-                "annualReviewDayAndMonthIndexation": {
-                    "type": "string",
-                    "description": "Annual review day and month for indexation increases"
-                },
-                "annualRateOfIndexationIncrease": {
-                    "type": "string",
-                    "description": "Annual rate of indexation increase percentage"
-                },
-                "waiverOfContribution": {
-                    "type": "string",
-                    "description": "Whether waiver of contribution, WOC or Waiver of premium benefit is available (Yes/No)"
-                },
-                "monthlyCostOfWaiver": {
-                    "type": "string",
-                    "description": "Monthly cost of the waiver of contribution benefit"
-                },
-                "gross_regular_amount": {
-                    "type": "string",
-                    "description": "Gross regular contribution amount"
-                },
-                "total_regular_contribution": {
-                    "type": "string",
-                    "description": "Total regular contribution including employer and employee amounts"
-                },
-                "date_of_last_contribution": {
-                    "type": "string",
-                    "description": "Date of the last contribution made"
+                    "description": "Whether the scheme accepts transfers in from other pensions (Yes/No)"
                 }
             }
         },
-        "contribution_history": {
-            "type": "array",
-            "description": "Extract ALL contributions from inception to current date - every contribution made to this policy",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "date": {
-                        "type": "string",
-                        "description": "Date of contribution"
-                    },
-                    "amount": {
-                        "type": "string",
-                        "description": "Contribution amount"
-                    },
-                    "type": {
-                        "type": "string",
-                        "description": "Type (Employee/Employer/Transfer)"
+        "scheme_membership": {
+            "type": "object",
+            "description": "Scheme membership details",
+            "properties": {
+                "isClientMember": {
+                    "type": "string",
+                    "description": "Whether the client is a member of the scheme (Yes/No)"
+                },
+                "qualifyingWorkplacePension": {
+                    "type": "string",
+                    "description": "Whether this is a qualifying workplace pension scheme (Yes/No)"
+                },
+                "schemeTypeMoneyPurchase": {
+                    "type": "string",
+                    "description": "Whether the scheme type is money purchase (DC) (Yes/No)"
+                },
+                "autoEnrolmentCompliant": {
+                    "type": "string",
+                    "description": "Whether the scheme is auto-enrolment compliant (Yes/No)"
+                },
+                "membershipStartDate": {
+                    "type": "string",
+                    "description": "Date member joined the scheme (DD/MM/YYYY)"
+                },
+                "yearsOfService": {
+                    "type": "string",
+                    "description": "Total years of service in the scheme"
+                },
+                "activeOrDeferred": {
+                    "type": "string",
+                    "description": "Whether membership is active or deferred"
+                },
+                "normalRetirementAge": {
+                    "type": "string",
+                    "description": "Normal retirement age for the scheme"
+                }
+            }
+        },
+        "employer_contributions": {
+            "type": "object",
+            "description": "Employer contribution details",
+            "properties": {
+                "maxEmployerContributionsUsed": {
+                    "type": "string",
+                    "description": "Whether maximum employer contributions are being used (Yes/No)"
+                },
+                "additionalMatchingAvailable": {
+                    "type": "string",
+                    "description": "Whether additional matching contributions are available (Yes/No)"
+                },
+                "salarySacrificeAvailable": {
+                    "type": "string",
+                    "description": "Whether salary sacrifice is available for contributions (Yes/No)"
+                },
+                "employerNiSavingPassedToClient": {
+                    "type": "string",
+                    "description": "Whether employer National Insurance savings are passed to the client (Yes/No)"
+                },
+                "employerNiSavingAmount": {
+                    "type": "string",
+                    "description": "Amount of employer National Insurance savings passed to client (Currency GBP)"
+                }
+            }
+        },
+        "contact_details": {
+            "type": "object",
+            "description": "Contact information",
+            "properties": {
+                "contactName": {
+                    "type": "string",
+                    "description": "Name of the contact person at the provider"
+                },
+                "callerName": {
+                    "type": "string",
+                    "description": "Name of the person who made the call"
+                },
+                "clientName": {
+                    "type": "string",
+                    "description": "Name of the client"
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "description": "Contact phone number"
+                },
+                "dateOfCall": {
+                    "type": "string",
+                    "description": "Date when the call was made (DD/MM/YYYY)"
+                },
+                "timeOfCall": {
+                    "type": "string",
+                    "description": "Time when the call was made (HH:MM)"
+                }
+            }
+        },
+        "funds": {
+            "type": "object",
+            "description": "Current and default fund information",
+            "properties": {
+                "current_funds": {
+                    "type": "array",
+                    "description": "List of current funds held (Note: Multiple fund entries are supported)",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "fundName": {
+                                "type": "string",
+                                "description": "Name of the current fund"
+                            },
+                            "currentFundValue": {
+                                "type": "string",
+                                "description": "Current value of the fund (Currency GBP)"
+                            },
+                            "amcTer": {
+                                "type": "string",
+                                "description": "Annual Management Charge (AMC) or Total Expense Ratio (TER) (Percentage)"
+                            },
+                            "allocationAfterDiscounts": {
+                                "type": "string",
+                                "description": "Allocation rate after any discounts applied (Percentage)"
+                            }
+                        }
+                    }
+                },
+                "default_funds_if_not_member": {
+                    "type": "array",
+                    "description": "Default funds if not a member (Note: Multiple default fund entries are supported)",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "fundName": {
+                                "type": "string",
+                                "description": "Name of the default fund if not a member"
+                            },
+                            "charges": {
+                                "type": "string",
+                                "description": "Charges applicable to the default fund (Text/Percentage)"
+                            }
+                        }
                     }
                 }
             }
         },
-        "flexibility_and_withdrawals": {
+        "fund_holdings": {
+            "type": "array",
+            "description": "Current fund holdings - ONLY extract funds the client is invested in with their values",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "fundName": {
+                        "type": "string",
+                        "description": "Name of the fund held in the policy"
+                    },
+                    "fundValue": {
+                        "type": "string",
+                        "description": "Current value of the fund in GBP"
+                    },
+                    "allocation": {
+                        "type": "string",
+                        "description": "Allocation percentage"
+                    },
+                    "units": {
+                        "type": "string",
+                        "description": "Number of units held"
+                    },
+                    "unitPrice": {
+                        "type": "string",
+                        "description": "Unit price in GBP"
+                    }
+                }
+            }
+        },
+        "notes": {
+            "type": "string",
+            "description": "General notes and additional information about the scheme (Text Multi-line)"
+        },
+        "extraction_metadata": {
             "type": "object",
-            "description": "Withdrawal and flexibility options",
+            "description": "Processing information",
             "properties": {
-                "flexiAccessDrawdown": {
-                    "type": "string",
-                    "description": "Whether flexi-access drawdown is available on the plan. Flexible Income Drawdown. Income Drawdown. Drawdown. FAD. If the plan must be transferred to another scheme to get Flexible Access Drawdown benefits, then this is NO (Yes/No)"
+                "processingTimeSeconds": {
+                    "type": "number",
+                    "description": "Time taken to process the document (Number)"
                 },
-                "ufplsAvailable": {
-                    "type": "string",
-                    "description": "Whether UFPLS withdrawals are available (Yes/No)"
+                "useGpt": {
+                    "type": "boolean",
+                    "description": "Whether GPT was used in extraction (Boolean)"
                 },
-                "ufpls": {
-                    "type": "string",
-                    "description": "Whether UFPLS (Uncrystallised Funds Pension Lump Sum) is available on a FULL encashment basis (Yes/No)"
-                },
-                "partialUfplsAvailable": {
-                    "type": "string",
-                    "description": "Whether partial UFPLS withdrawals are available"
-                },
-                "partialTransferPossible": {
-                    "type": "string",
-                    "description": "Whether partial transfers are possible (Yes/No)"
-                },
-                "minimumAmountToLeave": {
-                    "type": "string",
-                    "description": "Minimum amount that must be left behind for partial transfers"
-                },
-                "transferPenalty": {
-                    "type": "string",
-                    "description": "Details of any transfer penalties, Early Withdrawal Charges (EWC), exit costs, exit fees, Early Claim Charge, etc. that apply"
-                },
-                "transferPenaltyEndDate": {
-                    "type": "string",
-                    "description": "Date when transfer penalties will end or reduce"
+                "pagesProcessed": {
+                    "type": "number",
+                    "description": "Number of pages processed (Number)"
                 }
             }
         },
@@ -351,44 +700,6 @@
                 "otherGuarantees": {
                     "type": "string",
                     "description": "Any other guarantees or protections"
-                }
-            }
-        },
-        "transfers_and_guarantees": {
-            "type": "object",
-            "description": "Transfers in and guarantee details",
-            "properties": {
-                "transfersInOrLumpSumContributions": {
-                    "type": "string",
-                    "description": "Details of transfers in or lump sum contributions made. Payments which were Transfer In Payments"
-                },
-                "bulkBlockTransfer": {
-                    "type": "string",
-                    "description": "Whether transfers were part of a bulk or block transfer arrangement"
-                },
-                "aDayValueTfc": {
-                    "type": "string",
-                    "description": "For Pensions with a Start Date before A-day, i.e. 06/04/2006, the value of the Tax Free Cash Lump Sum Entitlement as of that day for the pension. For plans that started pre A-Day, the Tax Free Cash may be Protected i.e. over the standard 25%"
-                },
-                "aDayFundValue": {
-                    "type": "string",
-                    "description": "For Pensions with a Start Date before A-day, i.e. 06/04/2006, the value of the Pension itself as of that day"
-                },
-                "enhancedTfcCheck": {
-                    "type": "string",
-                    "description": "Whether the plan has Protected or Enhanced Tax Free Cash, i.e. Tax Free Cash entitlement of ABOVE 25% (Yes/No)"
-                },
-                "garGmpGuarantees": {
-                    "type": "string",
-                    "description": "Details of any Guaranteed Annuity Rate (GAR), Guaranteed Minimum Pension (GMP), or other guarantees, or Safeguarded Benefits"
-                },
-                "generalGuarantee": {
-                    "type": "string",
-                    "description": "General guarantee information and details for Safeguarded benefits"
-                },
-                "lifeCover": {
-                    "type": "string",
-                    "description": "Details of life cover benefits attached to the pension plan"
                 }
             }
         },
@@ -440,218 +751,6 @@
                 }
             }
         },
-        "fund_info": {
-            "type": "object",
-            "description": "Fund availability and switching information",
-            "properties": {
-                "numberOfFundsAvailable": {
-                    "type": "string",
-                    "description": "Total number of funds available for investment"
-                },
-                "numberOfFundManagers": {
-                    "type": "string",
-                    "description": "Number of different fund managers available"
-                },
-                "maxFundsAtOneTime": {
-                    "type": "string",
-                    "description": "Maximum number of funds that can be held at one time"
-                },
-                "fundSwitches": {
-                    "type": "string",
-                    "description": "Details of fund switching options and any restrictions"
-                },
-                "origoOptionsCase": {
-                    "type": "string",
-                    "description": "Whether the plan supports Origo Options for electronic transfers"
-                }
-            }
-        },
-        "with_profits": {
-            "type": "object",
-            "description": "With-profits fund information",
-            "properties": {
-                "withProfits": {
-                    "type": "string",
-                    "description": "Whether the plan includes with-profits investments"
-                },
-                "terminalFinalBonus": {
-                    "type": "string",
-                    "description": "Details of terminal or final bonus arrangements"
-                },
-                "mva": {
-                    "type": "string",
-                    "description": "MVA (Market Value Adjustment) or sometime MVR (Market Value Reduction) is essentially a Transfer Penalty or Reduction which reduces With Profits funds on Transfer"
-                },
-                "mvaFreeDate": {
-                    "type": "string",
-                    "description": "Date when MVA will no longer apply"
-                },
-                "wpBonusRate": {
-                    "type": "string",
-                    "description": "Current with-profits bonus rate"
-                },
-                "bonusHistoryLast5Years": {
-                    "type": "string",
-                    "description": "Bonus history for the last 5 years"
-                },
-                "guarantees": {
-                    "type": "string",
-                    "description": "Details of any guarantees (bonus rate, minimum annuity, reversionary bonus, cash sum)"
-                },
-                "guaranteeCostCharge": {
-                    "type": "string",
-                    "description": "Cost charge for any guarantees provided"
-                }
-            }
-        },
-        "projections": {
-            "type": "object",
-            "description": "Pension projections and growth estimates",
-            "properties": {
-                "paidUpProjectionsToSra": {
-                    "type": "string",
-                    "description": "Projections or Illustrations of the Pension Value to the client's State Retirement Age (SRA) (65, 67 etc). For pension that are receiving current regular contributions this will be the projection on a Ceased or Paid Up basis"
-                },
-                "regularsContinuingProjectionsToSra": {
-                    "type": "string",
-                    "description": "Projections or Illustrations of the Pension Value to the client's State Retirement Age (SRA) (65, 67 etc). For pension that are receiving current regular contributions this will be the projection on a Continuing basis i.e. presuming the payments will continue to retirement age"
-                },
-                "projectionStartDate": {
-                    "type": "string",
-                    "description": "The date the projection was created"
-                },
-                "projectionEndDate": {
-                    "type": "string",
-                    "description": "The date the Projection is to, usually Selected Retirement Age (SRA)"
-                },
-                "projectionGrowthRate": {
-                    "type": "string",
-                    "description": "The Growth Rate of the Projection (always select the Medium Rate), will be a percentage. Look for the Average Mid Growth Rate. If no Average Rate, then individual funds will have growth Rates"
-                },
-                "inflationRate": {
-                    "type": "string",
-                    "description": "The Rate of Inflation presumed on the Projection (usually 2%)"
-                },
-                "isLifestylingApplied": {
-                    "type": "string",
-                    "description": "Whether lifestyling or a lifestyle profile is applicable on the plan (Yes/No)"
-                },
-                "ifLifestylingOverallGrowthRate": {
-                    "type": "string",
-                    "description": "Overall growth rate used in projections if lifestyling is applied"
-                },
-                "partialTransferPossible": {
-                    "type": "string",
-                    "description": "Whether partial transfers are possible from the plan"
-                },
-                "chargingStructureAlterIfContributionsCease": {
-                    "type": "string",
-                    "description": "Whether the charging structure would change if contributions cease"
-                },
-                "canClientTransferFundButStillContribute": {
-                    "type": "string",
-                    "description": "Whether client can transfer fund away but continue making contributions"
-                },
-                "contributionsHistoryReceived": {
-                    "type": "string",
-                    "description": "Whether a contributions history has been received"
-                }
-            }
-        },
-        "scheme_membership": {
-            "type": "object",
-            "description": "Scheme membership details",
-            "properties": {
-                "membershipStartDate": {
-                    "type": "string",
-                    "description": "Date member joined the scheme (DD/MM/YYYY)"
-                },
-                "yearsOfService": {
-                    "type": "string",
-                    "description": "Total years of service in the scheme"
-                },
-                "activeOrDeferred": {
-                    "type": "string",
-                    "description": "Whether membership is active or deferred"
-                },
-                "normalRetirementAge": {
-                    "type": "string",
-                    "description": "Normal retirement age for the scheme"
-                },
-                "is_client_member": {
-                    "type": "string",
-                    "description": "Whether the client is a member of the scheme"
-                },
-                "qualifying_workplace_pension": {
-                    "type": "string",
-                    "description": "Whether this is a qualifying workplace pension scheme"
-                },
-                "scheme_type_money_purchase": {
-                    "type": "string",
-                    "description": "Whether the scheme type is money purchase (DC)"
-                },
-                "auto_enrolment_compliant": {
-                    "type": "string",
-                    "description": "Whether the scheme is auto-enrolment compliant"
-                }
-            }
-        },
-        "ess_specific": {
-            "type": "object",
-            "description": "ESS-specific information",
-            "properties": {
-                "currentEssProvider": {
-                    "type": "string",
-                    "description": "Name of the current ESS (Employer-Sponsored Scheme) provider"
-                },
-                "isSchemeADb": {
-                    "type": "string",
-                    "description": "Whether the scheme is a Defined Benefit (DB) scheme"
-                },
-                "memberWithinLast12Months": {
-                    "type": "string",
-                    "description": "Whether the client became a member within the last 12 months"
-                },
-                "availableAvcDcPlanLinked": {
-                    "type": "string",
-                    "description": "Whether there is an available AVC or DC plan linked to the scheme"
-                },
-                "canTfcBeCommutedFromAvcDcToPreserveDb": {
-                    "type": "string",
-                    "description": "Whether TFC can be commuted from AVC/DC to preserve DB benefits"
-                },
-                "schemeAcceptTransfersIn": {
-                    "type": "string",
-                    "description": "Whether the scheme accepts transfers in from other pensions"
-                }
-            }
-        },
-        "employer_contributions": {
-            "type": "object",
-            "description": "Employer contribution details",
-            "properties": {
-                "max_employer_contributions_used": {
-                    "type": "string",
-                    "description": "Whether maximum employer contributions are being used"
-                },
-                "additional_matching_available": {
-                    "type": "string",
-                    "description": "Whether additional matching contributions are available"
-                },
-                "salary_sacrifice_available": {
-                    "type": "string",
-                    "description": "Whether salary sacrifice is available for contributions"
-                },
-                "employer_NI_saving_passed_to_client": {
-                    "type": "string",
-                    "description": "Whether employer National Insurance savings are passed to the client"
-                },
-                "employer_NI_saving_amount": {
-                    "type": "string",
-                    "description": "Amount of employer National Insurance savings passed to client"
-                }
-            }
-        },
         "defined_benefit_info": {
             "type": "object",
             "description": "Defined Benefit scheme specific information (if applicable)",
@@ -697,84 +796,6 @@
                 "partialTransferAllowed": {
                     "type": "string",
                     "description": "Whether partial transfers are allowed (Yes/No)"
-                }
-            }
-        },
-        "contact_details": {
-            "type": "object",
-            "description": "Contact information",
-            "properties": {
-                "contact_name": {
-                    "type": "string",
-                    "description": "Name of the contact person at the provider"
-                },
-                "caller_name": {
-                    "type": "string",
-                    "description": "Name of the person who made the call"
-                },
-                "client_name": {
-                    "type": "string",
-                    "description": "Name of the client"
-                },
-                "phone_number": {
-                    "type": "string",
-                    "description": "Contact phone number"
-                },
-                "date_of_call": {
-                    "type": "string",
-                    "description": "Date when the call was made"
-                },
-                "time_of_call": {
-                    "type": "string",
-                    "description": "Time when the call was made"
-                }
-            }
-        },
-        "funds": {
-            "type": "object",
-            "description": "Current and default fund information",
-            "properties": {
-                "current_funds": {
-                    "type": "array",
-                    "description": "List of current funds held",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "fund_name": {
-                                "type": "string",
-                                "description": "Name of the current fund"
-                            },
-                            "current_fund_value": {
-                                "type": "string",
-                                "description": "Current value of the fund"
-                            },
-                            "amc_ter": {
-                                "type": "string",
-                                "description": "Annual Management Charge (AMC) or Total Expense Ratio (TER)"
-                            },
-                            "allocation_after_discounts": {
-                                "type": "string",
-                                "description": "Allocation rate after any discounts applied"
-                            }
-                        }
-                    }
-                },
-                "default_funds_if_not_member": {
-                    "type": "array",
-                    "description": "Default funds if not a member",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "fund_name": {
-                                "type": "string",
-                                "description": "Name of the default fund if not a member"
-                            },
-                            "charges": {
-                                "type": "string",
-                                "description": "Charges applicable to the default fund"
-                            }
-                        }
-                    }
                 }
             }
         },
@@ -829,10 +850,6 @@
                     "description": "Company registration number"
                 }
             }
-        },
-        "notes": {
-            "type": "string",
-            "description": "Additional notes or comments about the scheme"
         }
     }
 }
