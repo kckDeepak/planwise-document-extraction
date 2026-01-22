@@ -114,7 +114,13 @@ EXTRACTION RULES:
     /**
      * Save custom ceding schema with additional fields
      */
-    async saveCustomCedingSchema(customFields: Array<{ name: string; type: string; description: string; section?: string }>): Promise<{ success: boolean; schemaName: string }> {
+    async saveCustomCedingSchema(customFields: Array<{ 
+        name: string; 
+        type: string; 
+        description: string; 
+        section?: string;
+        columns?: Array<{ name: string; type: string; description: string }>;
+    }>): Promise<{ success: boolean; schemaName: string }> {
         // Load base ceding schema
         const cedingSchema = await this.getSchema('ceding');
         if (!cedingSchema) {
@@ -145,11 +151,29 @@ EXTRACTION RULES:
 
             if (field.type === 'table' || field.type === 'array') {
                 fieldDef.type = 'array';
+                
+                // Build column properties from user-defined columns
+                const columnProperties: Record<string, { type: string; description: string }> = {};
+                
+                if (field.columns && field.columns.length > 0) {
+                    // User-defined columns
+                    for (const col of field.columns) {
+                        columnProperties[col.name] = {
+                            type: col.type || 'string',
+                            description: col.description || col.name,
+                        };
+                    }
+                } else {
+                    // Default fallback column
+                    columnProperties['value'] = {
+                        type: 'string',
+                        description: 'Table row value',
+                    };
+                }
+                
                 fieldDef.items = {
                     type: 'object',
-                    properties: {
-                        value: { type: 'string', description: 'Table row value' },
-                    },
+                    properties: columnProperties,
                 };
             } else {
                 fieldDef.type = field.type || 'string';
@@ -189,7 +213,49 @@ EXTRACTION RULES:
      * Get custom fields from custom_ceding schema (if exists)
      * Compares with base ceding schema to find added fields
      */
-    async getCustomCedingFields(): Promise<Array<{ name: string; type: string; description: string; section: string }>> {
+    /**
+     * Get a map of field paths to their types from the schema
+     * Used for adding field type information to extraction output
+     */
+    async getFieldTypeMap(schemaName: string): Promise<Record<string, string>> {
+        const schema = await this.getSchema(schemaName);
+        if (!schema || !schema.properties) {
+            return {};
+        }
+
+        const typeMap: Record<string, string> = {};
+
+        const processProperties = (properties: Record<string, any>, parentPath: string = '') => {
+            for (const [fieldName, fieldValue] of Object.entries(properties)) {
+                const field = fieldValue as any;
+                const fieldPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
+                
+                if (field.type === 'object' && field.properties) {
+                    // Recurse into nested objects
+                    processProperties(field.properties, fieldPath);
+                } else if (field.type === 'array') {
+                    // Mark arrays as 'table' type for display
+                    typeMap[fieldPath] = 'table';
+                } else if (field.type === 'boolean') {
+                    typeMap[fieldPath] = 'boolean';
+                } else {
+                    // Default to 'text' for strings and other types
+                    typeMap[fieldPath] = field.type || 'text';
+                }
+            }
+        };
+
+        processProperties(schema.properties);
+        return typeMap;
+    }
+
+    async getCustomCedingFields(): Promise<Array<{ 
+        name: string; 
+        type: string; 
+        description: string; 
+        section: string;
+        columns?: Array<{ name: string; type: string; description: string }>;
+    }>> {
         const customSchema = await this.getSchema('custom_ceding');
         const baseSchema = await this.getSchema('ceding');
         
@@ -197,7 +263,13 @@ EXTRACTION RULES:
             return [];
         }
 
-        const fields: Array<{ name: string; type: string; description: string; section: string }> = [];
+        const fields: Array<{ 
+            name: string; 
+            type: string; 
+            description: string; 
+            section: string;
+            columns?: Array<{ name: string; type: string; description: string }>;
+        }> = [];
         
         // Get base schema field names for comparison
         const baseFields: Record<string, Set<string>> = {};
@@ -224,12 +296,31 @@ EXTRACTION RULES:
                     
                     if (isCustomField) {
                         const field = fieldValue as any;
-                        fields.push({
+                        const fieldEntry: {
+                            name: string;
+                            type: string;
+                            description: string;
+                            section: string;
+                            columns?: Array<{ name: string; type: string; description: string }>;
+                        } = {
                             name: fieldName,
                             type: field.type === 'array' ? 'table' : (field.type || 'string'),
                             description: field.description || fieldName,
                             section: sectionName,
-                        });
+                        };
+                        
+                        // Extract column definitions for table/array types
+                        if (field.type === 'array' && field.items?.properties) {
+                            fieldEntry.columns = Object.entries(field.items.properties).map(
+                                ([colName, colDef]: [string, any]) => ({
+                                    name: colName,
+                                    type: colDef.type || 'string',
+                                    description: colDef.description || colName,
+                                })
+                            );
+                        }
+                        
+                        fields.push(fieldEntry);
                     }
                 }
             }
